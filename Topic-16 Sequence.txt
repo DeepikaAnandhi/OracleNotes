@@ -1,0 +1,237 @@
+SEQUENCE:
+=========
+	- it is db object which is used to generate 
+sequence numbers on a particular column automatically.
+	- providing "auto incremental value" facility.
+
+syntax:
+=======
+create sequence <sequence name>
+[start with n]
+[minvalue n]
+[increment by n]
+[maxvalue n]
+[no cycle / cycle]
+[no cache / cache n];
+
+start with n:
+=============
+	- it specify the starting value of a sequence.
+here "n" is number.
+
+minvalue n:
+===========
+	- it shows minimum value in the sequence.here
+"n" number.
+
+increment by n:
+===============
+	- it specify incremental value between sequence 
+numbers.here "n" number.
+
+maxvalue n:
+===========
+	- it shows maximum value in the sequence.here
+"n" number.
+
+		Ex:
+				create sequence s1
+				start with 1
+				minvalue 1
+				increment by 1
+				maxvalue 3;
+output:
+=======
+1
+2
+3----seq.stop
+
+NO CYCLE:
+=========
+	- it is a default parameter of sequence.
+	- when we create a sequence object with "no cycle" parameter
+then the set sequence numbers are not repeated again and again.
+
+		Ex:
+				create sequence s1
+				start with 1
+				minvalue 1
+				increment by 1
+				maxvalue 5;
+output:
+=======
+1
+2
+3
+4
+5------seq.stop
+
+CYCLE:
+======
+	- when we create a sequence object with "cycle" parameter
+then the set sequence numbers are repeated again and again.
+
+			Ex:
+				create sequence s1
+				start with 1
+				minvalue 1
+				increment by 1
+				maxvalue 3
+				cycle;
+output:
+=======
+1
+2
+3
+1
+2
+3
+1
+2
+3
+1
+2
+3
+
+no cache:
+=========
+	- it is a default parameter.
+	- cache is a temporary memory file.
+	- when we create a sequence object with "no cache" parameter
+then the set sequence numbers are saved in DB directly.so that
+whenever user want access the data based on sequence number
+then each and every request will to go database.
+		- so that the no.of users request will increase the 
+burdon on database and reduce the performance of database.
+
+cache n:
+========
+	- when we create a sequence object with "cache" parameter
+then the set sequence numbers are saved in DB and the copy of 
+sequence numbers are also saved in cache file memory.so that
+whenever user want access the data based on sequence number
+then each and every request will to go cache file instead
+database.
+		- so that it reduced no.of users requests and also 
+the burdon on database and improve the performance of database.
+here cache file size is min 2kb.
+
+Note:
+=====
+	- when we work on sequence object we should use the following\
+two pseudo columns are 
+	1. nextval : to generate next by next sequence number.
+	2. currval : it shows the current sequence number.
+
+			Ex:
+					1
+					2
+					3
+					4	-----> nextvalue = 5,currvalue = 4
+
+EX:
+SQL> CREATE SEQUENCE SQ1
+  2  START WITH 1
+  3  MINVALUE 1
+  4  INCREMENT BY 1
+  5  MAXVALUE 3;
+
+Sequence created.
+
+SQL> CREATE TABLE TEST1(SNO INT,NAME VARCHAR2(10));
+Table created.
+
+SQL> INSERT INTO TEST1 VALUES(SQ1.NEXTVAL,'&NAME');
+Enter value for name: A
+SQL> /
+Enter value for name: B
+SQL> /
+Enter value for name: C
+SQL> /
+Enter value for name: D
+ERROR at line 1:
+ORA-08004: sequence SQ1.NEXTVAL exceeds MAXVALUE and 
+cannot be instantiated
+
+ALTERING A SEQUENCE:
+====================
+SYNTAX:
+=======
+ALTER SEQUENCE <SEQUENCE NAME> <PARAMETER NAME> n;
+
+EX:
+SQL> ALTER SEQUENCE SQ1 MAXVALUE 5;
+Sequence altered.
+
+SQL> INSERT INTO TEST1 VALUES(SQ1.NEXTVAL,'&NAME');
+Enter value for name: D
+SQL> /
+Enter value for name: E
+SQL> /
+
+EX:
+SQL> CREATE SEQUENCE SQ2
+  2  START WITH 1
+  3  MINVALUE 1
+  4  INCREMENT BY 1
+  5  MAXVALUE 3
+  6  CYCLE
+  7  CACHE 2;
+
+Sequence created.
+
+SQL> CREATE TABLE TEST2(SNO INT,NAME VARCHAR2(10));
+
+Table created.
+
+SQL> INSERT INTO TEST2 VALUES(SQ2.NEXTVAL,'&NAME');
+Enter value for name: M
+SQL> /
+.......................
+SQL> /
+.......................
+
+EX:
+SQL> CREATE SEQUENCE SQ3
+  2  START WITH 3
+  3  MINVALUE 1
+  4  INCREMENT BY 1
+  5  MAXVALUE 5
+  6  CYCLE
+  7  CACHE 2;
+Sequence created.
+
+SQL> CREATE TABLE TEST3(SNO INT,NAME VARCHAR2(10));
+Table created.
+
+SQL> INSERT INTO TEST3 VALUES(SQ3.NEXTVAL,'&NAME');
+Enter value for name: A
+SQL> /
+Enter value for name: B
+SQL> /
+.......................
+SQL> /
+.......................
+
+NOTE:
+=====
+	- if we want to view all sequence objects in oracle db then
+we use a datadictionary is called as "user_sequences".
+
+EX:
+SQL> DESC USER_SEQUENCES;
+SQL> SELECT SEQUENCE_NAME FROM USER_SEQUENCES;
+
+HOW TO DROP A SEQUENCE:
+=======================
+SYNTAX:
+======
+DROP SEQUENCE <SEQUENCE NAME>;
+
+EX:
+DROP SEQUENCE SQ1;
+
+
+
+
+

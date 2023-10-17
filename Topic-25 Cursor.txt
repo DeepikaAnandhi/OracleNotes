@@ -1,0 +1,445 @@
+								PL/SQL
+								======
+CURSOR:
+=======	
+	- is a temporary memory / sql private area /
+workspace.
+				1. Explicit cursors(User defined cursor)
+				2. Implicit cursors(System defined cursor)						
+
+1. Explicit cursors:
+=====================
+	- these cursors are created by user for fetching / accessing
+data from a table in row by row manner.
+	- a cursor can store / hold multiple rows but we can access
+a single row only from a cursor.
+	- user can created an expicit cursor by following the 4 
+steps procedure.
+
+step1: declare a cursor variable:
+=================================
+syntax:
+=======
+declare cursor <cursor name> is <select query>;
+
+step2: open cursor:
+===================
+syntax:
+=======
+open <cursor name>;
+
+step3: fetch rows from a cursor in one by one row:
+==================================================
+syntax:
+=======
+fetch <cursor name> into <variables>;
+
+step4: close cursor:
+====================
+syntax:
+=======
+close <cursor name>;
+
+Attributes of an Explicit cursor:
+=================================
+	- are used to check the status of a cursor.
+
+syntax:
+=======
+	<cursor name>%<attribute name>;
+
+i) %open:
+=========
+	- it is default attribute of a cursor.
+	- it return true when cursor connection successfully open
+otherwise return false.
+	- it is a boolean type.
+
+ii) %found:
+===========
+	- it return true when cursor is having data otherwise 
+return false.
+	- it is a boolean type.
+
+iii) %notfound:
+===============
+	- it return true when cursor is not having data otherwise 
+return false.
+	- it is a boolean type.
+
+iv) %rowcount:
+==============
+	- it return no.of fetch statements are executed.
+	- it is a number type.
+
+Ex:
+write a cursor program to fetch a single row from a table?
+SQL> DECLARE CURSOR C1 IS SELECT ENAME,SAL FROM EMP;
+    v_ENAME VARCHAR2(10);
+    v_SAL NUMBER(10);
+    BEGIN
+    OPEN C1;
+    FETCH C1 INTO v_ENAME,v_SAL;
+    DBMS_OUTPUT.PUT_LINE(v_ENAME||','||v_SAL);
+    CLOSE C1;
+    END;
+   /
+SMITH,800
+
+PL/SQL procedure successfully completed.
+
+Ex:
+write a cursor program to fetch MULTIPLE rows from a table?
+DECLARE CURSOR C1 IS SELECT ENAME,SAL FROM EMP;
+    v_ENAME VARCHAR2(10);
+    v_SAL NUMBER(10);
+    BEGIN
+    OPEN C1;
+    FETCH C1 INTO v_ENAME,v_SAL;
+    DBMS_OUTPUT.PUT_LINE(v_ENAME||','||v_SAL);
+	 FETCH C1 INTO v_ENAME,v_SAL;
+    DBMS_OUTPUT.PUT_LINE(v_ENAME||','||v_SAL);
+	 FETCH C1 INTO v_ENAME,v_SAL;
+    DBMS_OUTPUT.PUT_LINE(v_ENAME||','||v_SAL);
+    CLOSE C1;
+    END;
+	 /
+SMITH,800
+ALLEN,1600
+WARD,1250
+
+PL/SQL procedure successfully completed.
+
+NOTE:
+=====
+	- whenever we want to fetch multiple rows from a cursor 
+instead of writing multiple "fetch statements" we can use
+looping statements like below.
+
+i) by using "simple loop"
+==========================
+SQL> DECLARE CURSOR S1 IS SELECT ENAME,SAL FROM EMP;
+  2  v_ENAME VARCHAR2(10);
+  3  v_SAL NUMBER(10);
+  4  BEGIN
+  5  OPEN S1;
+  6  LOOP
+  7  FETCH S1 INTO v_ENAME,v_SAL;
+  8  EXIT WHEN S1%NOTFOUND;
+  9  DBMS_OUTPUT.PUT_LINE(v_ENAME||','||v_SAL);
+ 10  END LOOP;
+ 11  CLOSE S1;
+ 12  END;
+ 13  /
+SMITH,800
+ALLEN,1600
+WARD,1250
+JONES,2975
+MARTIN,1250
+BLAKE,2850
+CLARK,2450
+SCOTT,3000
+KING,5000
+TURNER,1500
+ADAMS,1100
+JAMES,950
+FORD,3000
+MILLER,1300
+
+PL/SQL procedure successfully completed.
+
+ii) by using "while loop"
+=========================
+SQL> DECLARE CURSOR C1 IS SELECT ENAME,SAL FROM EMP;
+  2  v_ENAME VARCHAR2(10);
+  3  v_SAL NUMBER(10);
+  4  BEGIN
+  5  OPEN C1;
+  6  FETCH C1 INTO v_ENAME,v_SAL;-----FETCHING STARTS FROM 1 ROW
+  7  WHILE(C1%FOUND)
+  8  LOOP
+  9  DBMS_OUTPUT.PUT_LINE(v_ENAME||' '||v_SAL);
+ 10  FETCH C1 INTO v_ENAME,v_SAL;-----FETCH WILL CONTINUE UPTO LAST ROW.
+ 11  END LOOP;
+ 12  CLOSE C1;
+ 13  END;
+ 14  /
+SMITH 800
+ALLEN 1600
+WARD 1250
+JONES 2975
+MARTIN 1250
+BLAKE 2850
+CLARK 2450
+SCOTT 3000
+KING 5000
+TURNER 1500
+ADAMS 1100
+JAMES 950
+FORD 3000
+MILLER 1300
+
+PL/SQL procedure successfully completed.
+
+iii) by using "for loop"
+=========================
+SQL> DECLARE CURSOR C1 IS SELECT ENAME,SAL FROM EMP;
+  2  BEGIN
+  3  FOR i IN C1
+  4  LOOP
+  5  DBMS_OUTPUT.PUT_LINE(i.ENAME||','||i.SAL);
+  6  END LOOP;
+  7  END;
+  8  /
+SMITH,800
+ALLEN,1600
+WARD,1250
+JONES,2975
+MARTIN,1250
+BLAKE,2850
+CLARK,2450
+SCOTT,3000
+KING,5000
+TURNER,1500
+ADAMS,1100
+JAMES,950
+FORD,3000
+MILLER,1300
+
+PL/SQL procedure successfully completed.
+
+NOTE:
+=====
+	- whenever we are using a "for loop" statement there is no need to write
+the following statements are "open cursor,fetch from cursor and close cursor"
+by explicitly(user defined) because internally oracle server will perform
+these operations on cursor by automatically.
+
+2.IMPLICIT CURSOR:
+==================
+	- these cursors are created by system automatically when we perform 
+DML operations over a database table.implicit cursor name is "SQL".
+	- implicit cursor are used to check the status of the last DML command
+is executed or not.
+
+Attributes of Implicit cursor:
+==============================
+i) %isopen:
+===========
+	- it is a default attributes.which return true when cursor connection
+is successfully open otherwise return false.
+
+ii) %found:
+===========
+	- it return true when the last DML command is executed successfully 
+otherwise return false.
+
+iii) %notfound:
+================
+	- it return true when the last DML command is not executed(fail)
+otherwise return false.
+
+iv) %rowcount:
+==============
+	- it return the no.of rows are affected with DML command.
+
+EX:
+SQL> DECLARE
+  2  v_EMPNO NUMBER(10);
+  3  BEGIN
+  4  v_EMPNO:=&v_EMPNO;
+  5  DELETE FROM EMP WHERE EMPNO=v_EMPNO;
+  6  IF(SQL%FOUND) THEN
+  7  DBMS_OUTPUT.PUT_LINE('RECORD IS FOUND AND DELETED');
+  8  ELSE
+  9  DBMS_OUTPUT.PUT_LINE('RECORD IS NOT FOUND');
+ 10  END IF;
+ 11  END;
+ 12  /
+Enter value for v_empno: 7788
+RECORD IS FOUND AND DELETED
+
+PL/SQL procedure successfully completed.
+
+SQL> /
+Enter value for v_empno: 1122
+RECORD IS NOT FOUND
+
+PL/SQL procedure successfully completed.
+
+REF CURSOR:
+===========
+	- when we assign a "select query" at the time of opening
+a cursor is called as "ref cursor" and it is also called as
+dynamic cursor.
+					i) weak ref cursor
+					ii) strong ref cursor
+
+
+	weak ref cursor					strong ref cursor
+	===============					=================
+1. it can declare without			1. it can declare with
+return type.							return type.
+
+2. is having a pre-defined 		2. there is no pre-defined 
+datatype for variable 				datatype so that we want to 
+declaration.							a user defined datatype for
+											strong ref cursor variabe 
+											declaration.
+
+3. it can access data from 		3. it can access data from
+any table(i.e multiple tables)	 a specific table(single table only).
+
+weak ref cursor with a single table:
+====================================
+EX:
+SQL> DECLARE
+  2  WRC SYS_REFCURSOR;
+  3  i EMP%ROWTYPE;
+  4  BEGIN
+  5  OPEN WRC FOR SELECT * FROM EMP WHERE DEPTNO=10;
+  6  LOOP
+  7  FETCH WRC INTO i;
+  8  EXIT WHEN WRC%NOTFOUND;
+  9  DBMS_OUTPUT.PUT_LINE(i.ENAME||','||i.DEPTNO);
+ 10  END LOOP;
+ 11  CLOSE WRC;
+ 12  END;
+ 13  /
+CLARK,10
+KING,10
+MILLER,10
+
+PL/SQL procedure successfully completed.
+
+strong ref cursor with a single table:
+=====================================
+syntax to create a user defined datatype for strong ref cursor
+variable:
+========
+type <type name> is ref cursor return <type>;
+
+EX:
+SQL> DECLARE
+  2  TYPE UD_REFCURSOR IS REF CURSOR RETURN EMP%ROWTYPE;
+  3  SRC UD_REFCURSOR;
+  4  i EMP%ROWTYPE;
+  5  BEGIN
+  6  OPEN SRC FOR SELECT * FROM EMP WHERE DEPTNO=10;
+  7  LOOP
+  8  FETCH SRC INTO i;
+  9  EXIT WHEN SRC%NOTFOUND;
+ 10  DBMS_OUTPUT.PUT_LINE(i.ENAME||','||i.DEPTNO);
+ 11  END LOOP;
+ 12  CLOSE SRC;
+ 13  END;
+ 14  /
+CLARK,10
+KING,10
+MILLER,10
+
+PL/SQL procedure successfully completed.
+
+weak ref cursor with multiple tables:
+====================================
+SQL> DECLARE
+    WRC SYS_REFCURSOR;
+    i EMP%ROWTYPE;
+    j DEPT%ROWTYPE;
+    v_DEPTNO NUMBER(10):=&v_DEPTNO;
+    BEGIN
+    IF v_DEPTNO=10 THEN
+    OPEN WRC FOR SELECT * FROM EMP WHERE DEPTNO=10;
+    LOOP
+   FETCH WRC INTO i;
+   EXIT WHEN WRC%NOTFOUND;
+   DBMS_OUTPUT.PUT_LINE(i.ENAME||','||i.DEPTNO);
+   END LOOP;
+   ELSIF v_DEPTNO=20 THEN
+   OPEN WRC FOR SELECT * FROM DEPT WHERE DEPTNO=20;
+   LOOP
+   FETCH WRC INTO j;
+   EXIT WHEN WRC%NOTFOUND;
+   DBMS_OUTPUT.PUT_LINE(j.DEPTNO||','||j.DNAME||','||j.LOC);
+   END LOOP;
+   CLOSE WRC;
+   END IF;
+   END;
+   /
+
+OUTPUT:
+Enter value for v_deptno: 10
+CLARK,10
+KING,10
+MILLER,10
+PL/SQL procedure successfully completed.
+
+SQL> /
+Enter value for v_deptno: 20
+20,RESEARCH,DALLAS
+PL/SQL procedure successfully completed.
+
+EX:
+	DECLARE
+	TYPE UD_REFCURSOR IS REF CURSOR RETURN EMP%ROWTYPE;
+    SRC UD_REFCURSOR;
+    i EMP%ROWTYPE;
+    j DEPT%ROWTYPE;
+    v_DEPTNO NUMBER(10):=&v_DEPTNO;
+    BEGIN
+    IF v_DEPTNO=10 THEN
+    OPEN SRC FOR SELECT * FROM EMP WHERE DEPTNO=10;
+    LOOP
+   FETCH SRC INTO i;
+   EXIT WHEN SRC%NOTFOUND;
+   DBMS_OUTPUT.PUT_LINE(i.ENAME||','||i.DEPTNO);
+   END LOOP;
+   ELSIF v_DEPTNO=20 THEN
+   OPEN SRC FOR SELECT * FROM DEPT WHERE DEPTNO=20;
+   LOOP
+   FETCH SRC INTO j;
+   EXIT WHEN SRC%NOTFOUND;
+   DBMS_OUTPUT.PUT_LINE(j.DEPTNO||','||j.DNAME||','||j.LOC);
+   END LOOP;
+   CLOSE SRC;
+   END IF;
+   END;
+   /
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

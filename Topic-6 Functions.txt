@@ -1,0 +1,974 @@
+FUNCTIONS:
+==========
+	- to perfrom some task and must be return a value.
+	- oracle supports the following two types of 
+	functions,
+		1) pre-defined functions
+				> use in SQL & PL/SQL
+ 
+		2) user-defined functions
+				> use in PL/SQL
+
+
+1) pre-defined functions:
+=========================
+	- these functions are also called as "built in
+functions" in oracle.
+			i) single row functions
+			ii) multiple row functions.
+
+i) single row functions:
+========================
+	- these functions are return a single value.
+	- these funcitons are also called as 
+		"scalar functions".
+					> numeric functions
+					> string functions(character)
+					> date functions
+					> conversion functions
+					> analytical functions (IN SUBQUERY)
+
+syntax to call a function:
+===========================
+select <fname>(value/(s)) from dual;
+
+What is dual?
+=============
+	- it is pre-defined / system defined table in oracle.
+	- is having a single row & single column.
+	- is also called as a "dummy" table in oracle.
+	- is used to test functions functionalities.
+
+to view the structure of dual table:
+====================================
+syntax:
+=======
+desc dual;
+
+ Name             Null?    Type
+ --------			-----		-------
+ DUMMY                     VARCHAR2(1)
+
+to view data of dual table:
+===========================
+syntax:
+=======
+select * from dual;
+
+D ----- column 
+-
+X ----- row
+
+Numeric functions
+==================
+ABS():
+======
+	- to convert (-ve) sign values into (+ve) sign values.
+
+syntax:
+=======
+	abs(n)
+
+Ex:
+SQL> SELECT ABS(-12) FROM DUAL;
+
+  ABS(-12)
+----------
+        12
+
+EX:
+SQL> SELECT ENAME,SAL,COMM,ABS(COMM-SAL) FROM EMP;
+
+CEIL():
+=======
+	- it return a value which is greater than to the given
+expression.
+
+syntax:
+========
+	ceil(n)
+
+EX:
+SQL> SELECT CEIL(9.8) FROM DUAL;
+
+ CEIL(9.8)
+----------
+        10
+
+SQL> SELECT CEIL(9.1) FROM DUAL;
+
+ CEIL(9.1)
+----------
+        10
+
+FLOOR():
+=========
+	- it return a value which is less than to the given expression.
+
+syntax:
+========
+	floor(n)
+
+Ex:
+SQL> SELECT FLOOR(9.3) FROM DUAL;
+
+FLOOR(9.3)
+----------
+         9
+
+SQL> SELECT FLOOR(9.8) FROM DUAL;
+
+FLOOR(9.8)
+----------
+         9
+
+POWER():
+========
+	-it return the power of the given value.
+
+syntax:
+========
+	power(m,n)
+
+Ex:
+SQL> SELECT POWER(2,3) FROM DUAL;
+
+POWER(2,3)
+----------
+         8
+
+MOD():
+======
+	- it return a remainder value.
+
+syntax:
+======
+	mod(m,n) 
+
+Ex:
+SQL> SELECT MOD(10,2) FROM DUAL;
+
+ MOD(10,2)
+----------
+         0
+
+ROUND():
+========
+	- it returns the nearest value to the given expression.
+			
+syntax:
+=======
+	round(expression,[decimal places])
+
+EX:
+SQL> SELECT ROUND(34.47) FROM DUAL;
+
+ROUND(34.47)
+------------
+          34
+
+SQL> SELECT ROUND(34.50) FROM DUAL;
+
+ROUND(34.50)
+------------
+          35
+
+SQL> SELECT ROUND(34.87) FROM DUAL;
+
+ROUND(34.87)
+------------
+          35
+
+NOTE:
+=====
+	- this function is consider 0.5 value
+		if decimal point value is less than to 0.5 then add "0".
+		if decimal point value is greater or is equal to 0.5 then add "1".
+
+		i) 34.47
+			 0.4<0.5 ----> add 0
+
+			34
+		+   0
+		-------
+			34
+
+		ii) 34.50
+				0.5 >= 0.5 ---> add 1
+	
+				34
+			+   1
+			======
+				35
+
+		iii) 34.87
+				0.8 >= 0.5 ----> add 1
+	
+				34
+			+	 1
+			------
+				35
+EX:
+SQL> SELECT ROUND(34.874,2) FROM DUAL;
+
+ROUND(34.874,2)
+---------------
+          34.87
+
+SQL> SELECT ROUND(34.875,2) FROM DUAL;
+
+ROUND(34.875,2)
+---------------
+          34.88				
+
+TRUNC():
+========
+	- it return an exact value of the given expression.
+
+syntax:
+=======
+	trunc(expression,[decimal places])
+
+EX:
+SQL> SELECT TRUNC(34.70) FROM DUAL;
+
+TRUNC(34.70)
+------------
+          34
+
+SQL> SELECT TRUNC(34.874,2) FROM DUAL;
+
+TRUNC(34.874,2)
+---------------
+          34.87
+
+STRING FUNCTIONS:
+=================
+LENGTH():
+=========
+	- return the length of the given string.
+
+syntax:
+=======
+	length(string)
+
+Ex:
+SQL> SELECT LENGTH('HELLO') FROM DUAL;
+
+LENGTH('HELLO')
+---------------
+              5
+
+SQL> SELECT LENGTH('WEL COME') FROM DUAL;
+
+LENGTH('WELCOME')
+-----------------
+                8
+
+SQL> SELECT ENAME,LENGTH(ENAME) FROM EMP;
+SQL> SELECT * FROM EMP WHERE LENGTH(ENAME)=6;
+
+INITCAP():
+==========
+	- to convert the first character is capital.
+
+syntax:
+=======
+	initcap(string)
+
+EX:
+SQL> SELECT INITCAP('hello') FROM DUAL;
+
+INITC
+-----
+Hello
+
+SQL> SELECT INITCAP('good afternoon') FROM DUAL;
+
+INITCAP('GOODA
+--------------
+Good Afternoon
+
+SQL> SELECT ENAME,INITCAP(ENAME) FROM EMP;
+
+CONCAT():
+=========
+	- adding two string expressions.
+
+syntax:
+=======
+	concat(string1,string2)
+
+EX:
+SQL> SELECT CONCAT('GOOD','MORNING') FROM DUAL;
+
+CONCAT('GOO
+-----------
+GOODMORNING
+
+SQL> SELECT CONCAT('Mr.',ENAME) FROM EMP;
+
+CONCAT('MR.',
+-------------
+Mr.SMITH
+
+LOWER():
+========
+	- to convert upper case char's into lower case char's.
+
+syntax:
+=======
+	lower(string)
+
+Ex:
+SQL> SELECT LOWER('HELLO') FROM DUAL;
+
+LOWER
+-----
+hello
+
+SQL> UPDATE EMP SET ENAME=LOWER(ENAME) WHERE JOB='MANAGER';
+SQL> UPDATE EMP SET ENAME=LOWER(ENAME);
+
+UPPER():
+========
+- to convert lower case char's into upper case char's.
+
+syntax:
+=======
+	upper(string)
+
+Ex:
+SQL> UPDATE EMP SET ENAME=UPPER(ENAME);
+
+LTRIM():
+=========
+	- to remove unwanted char's / spaces from the left side 
+of the given string.
+
+syntax:
+=======
+	ltrim(string,[trimming char])
+
+Ex:
+SQL> SELECT LTRIM('   SAI') FROM DUAL;
+
+LTR
+---
+SAI
+
+SQL> SELECT LTRIM('XXXXXSAI','X') FROM DUAL;
+
+LTR
+---
+SAI
+
+SQL> SELECT LTRIM('123SAI','123') FROM DUAL;
+
+LTR
+---
+SAI
+
+RTRIM():
+========
+- to remove unwanted char's / spaces from the RIGHT side 
+of the given string.
+
+syntax:
+=======
+	rtrim(string,[trimming char])
+
+Ex:
+SQL> SELECT RTRIM('SAIXXXXX','X') FROM DUAL;
+
+LTR
+---
+SAI
+
+TRIM():
+=======
+	- it remove unwanted char's/spaces from both sides of the 
+given string.
+
+syntax:
+=======
+	trim('trimming char' from string)
+
+Ex:
+SQL> SELECT TRIM('X' FROM 'XXXXSAIXXX') FROM DUAL;
+
+TRI
+---
+SAI
+
+REPLACE():
+==========
+	- to replace a string to string.
+
+syntax:
+=======
+	replace(string,'<old chars>','<new chars>')
+
+EX:
+SQL> SELECT REPLACE('HELLO','ELL','XY') FROM DUAL;
+
+REPL
+----
+HXYO
+
+SQL> SELECT REPLACE('JACK AND JUE','J','BL') FROM DUAL;
+
+REPLACE('JACKA
+--------------
+BLACK AND BLUE
+
+TRANSLATE():
+============
+	- to translate char by char.
+
+syntax:
+=======
+	translate(string,<old chars>,<new chars>)
+
+EX:
+SQL> SELECT TRANSLATE('HELLO','ELO','XYZ') FROM DUAL;
+
+TRANS				E=X , L=Y , O=Z
+-----
+HXYYZ
+
+SQL> SELECT TRANSLATE('HELLO','ELO','XY') FROM DUAL;
+
+TRAN
+----
+HXYY
+
+SUBSTR():
+=========
+	- returns the required sub string from the given string
+expression.
+
+syntax:
+=======
+	substr(string,<starting position of char>,<length of char's>)
+	
+
+EX:
+SQL> SELECT SUBSTR('WELCOME',3,2) FROM DUAL;
+
+SU
+--
+LC
+
+SQL> SELECT SUBSTR('WELCOME',4,4) FROM DUAL;
+
+SUBS
+----
+COME
+
+SQL> SELECT SUBSTR('WELCOME',6,3) FROM DUAL;
+
+SU
+--
+ME
+
+SQL> SELECT SUBSTR('WELCOME',-6,3) FROM DUAL;
+
+SUB
+---
+ELC
+
+INSTR():
+========
+	- returns the occurrence position of specific character
+from a string expression.
+
+syntax:
+=======
+instr(string,<specific char>,<starting position of char>,<occurrence position of char>)
+
+
+Note:
+=====
+	- position of characters are fixed either count from 
+left to right or right to left.
+
+	EX:
+			HELLO WELCOME
+			1234567890123
+
+EX:
+SQL> SELECT INSTR('HELLO WELCOME','E',1,1) FROM DUAL;
+
+INSTR('HELLOWELCOME','E',1,1)
+-----------------------------
+                            2
+
+SQL> SELECT INSTR('HELLO WELCOME','E',1,2) FROM DUAL;
+
+INSTR('HELLOWELCOME','E',1,2)
+-----------------------------
+                            8
+
+SQL> SELECT INSTR('HELLO WELCOME','E',1,3) FROM DUAL;
+
+INSTR('HELLOWELCOME','E',1,3)
+-----------------------------
+                           13
+
+
+SQL> SELECT INSTR('HELLO WELCOME','E',9,1) FROM DUAL;
+
+INSTR('HELLOWELCOME','E',9,1)
+-----------------------------
+                           13
+
+SQL> SELECT INSTR('HELLO WELCOME','L',-9,3) FROM DUAL;
+
+INSTR('HELLOWELCOME','L',-9,3)
+------------------------------
+                             0
+
+SQL> SELECT INSTR('HELLO WELCOME','L',-9,2) FROM DUAL;
+
+INSTR('HELLOWELCOME','L',-9,2)
+------------------------------
+                             3
+
+DATE FUNCTIONS:
+===============
+SYSDATE:
+=======
+	- it returns the current date of system.
+
+syntax:
+=======
+  sysdate
+
+Ex:
+SQL> SELECT SYSDATE FROM DUAL;
+
+SYSDATE
+---------
+29-JUL-22
+
+SQL> SELECT SYSDATE+10 FROM DUAL;
+
+SYSDATE+1
+---------
+08-AUG-22
+
+SQL> SELECT SYSDATE-10 FROM DUAL;
+
+SYSDATE-1
+---------
+19-JUL-22
+
+ADD_MONTHS():
+=============
+	- to add /subtract no.of months from given date expression.
+
+syntax:
+=======
+	add_months(date,<no.of months>)
+
+EX:
+SQL> SELECT ADD_MONTHS(SYSDATE,3) FROM DUAL;
+
+ADD_MONTH
+---------
+29-OCT-22
+
+SQL> SELECT ADD_MONTHS(SYSDATE,-3) FROM DUAL;
+
+ADD_MONTH
+---------
+29-APR-22
+
+EX:
+SQL> CREATE TABLE PRODUCT(PNAME VARCHAR2(10),
+  2  MFG DATE,EXP DATE);
+
+
+SQL> INSERT INTO PRODUCT VALUES('P1','29-MAY-2021',NULL);
+SQL> INSERT INTO PRODUCT VALUES('P2','15-JUN-2022',NULL);
+SQL> COMMIT;
+
+
+SQL> SELECT * FROM PRODUCT;
+
+PNAME      MFG       EXP
+---------- --------- ---------
+P1         29-MAY-21
+P2         15-JUN-22
+
+SQL> UPDATE PRODUCT SET EXP=ADD_MONTHS(MFG,24);
+2 rows updated.
+
+
+SQL> SELECT * FROM PRODUCT;
+
+PNAME      MFG       EXP
+---------- --------- ---------
+P1         29-MAY-21 29-MAY-23
+P2         15-JUN-22 15-JUN-24
+
+LAST_DAY():
+===========
+	- it return the last day of given month.
+
+syntax:
+========
+		last_day(date)
+
+Ex:
+SQL> SELECT LAST_DAY(SYSDATE) FROM DUAL;
+
+LAST_DAY(
+---------
+31-JUL-22
+
+MONTHS_BETWEEN():
+=================
+	- it returns the no.of months in between the given
+two date expressions.
+
+syntax:
+========
+	months_between(date1,date2)
+
+note:
+=====
+	- date1 is always greater than to date2 otherwise it returns
+(-ve) sing value.
+
+Ex:
+SQL> SELECT MONTHS_BETWEEN('12-JUN-21','12-JUN-22')
+  2  FROM DUAL;
+
+MONTHS_BETWEEN('12-JUN-21','12-JUN-22')
+---------------------------------------
+                                    -12
+
+SQL> SELECT MONTHS_BETWEEN('12-JUN-22','12-JUN-21')
+  2  FROM DUAL;
+
+MONTHS_BETWEEN('12-JUN-22','12-JUN-21')
+---------------------------------------
+                                     12
+
+CONVERSION FUNCTIONS:
+=====================
+	- TO_CHAR()
+	- TO_DATE()
+
+TO_CHAR():
+==========
+	- convert date type to char type and also it shows different
+formats of date.
+
+syntax:
+=======
+	to_char(date,'<interval>')
+
+Year Formats:
+---------------------------
+YYYY - 2022
+YY - 22
+YEAR - Twenty Twenty Two
+CC - Centuary 21
+AD / BC - Ad Year / Bc Year
+
+
+EX:
+SQL> SELECT TO_CHAR(SYSDATE,'YYYY YY YEAR CC BC') FROM DUAL;
+
+TO_CHAR(SYSDATE,'YYYYYYYEARCCBC')
+--------------------------------------------------------
+2022 22 TWENTY TWENTY-TWO 21 AD
+
+Month Format:
+----------------------------
+MM - Month IN Number Format
+MON - First Three Char's From Month Spelling
+MONTH - Full Name Of Month 
+
+EX:
+SQL> SELECT TO_CHAR(SYSDATE,'MM MON MONTH') FROM DUAL;
+
+TO_CHAR(SYSDATE,'MMMONMONTH')
+----------------------------------------------------
+07 JUL JULY
+
+Day Formats:
+-------------------------
+DDD - Day Of The Year.
+DD - Day Of The Month.
+D - Day Of The Week
+	Sun - 1
+	Mon - 2
+	Tue - 3
+	Wen - 4
+	Thu - 5
+	Fri - 6
+	Sat - 7
+DAY - Full Name Of The Day 
+DY - First Three Char's Of Day Spelling
+
+EX:
+SQL> SELECT TO_CHAR(SYSDATE,'DDD DD D DAY DY') FROM DUAL;
+
+TO_CHAR(SYSDATE,'DDDDDDDAYDY')
+----------------------------------------------------------
+211 30 7 SATURDAY  SAT
+
+
+Quater Format:
+----------------------------
+Q - One Digit Quater Of The Year.
+
+	1 - Jan - Mar
+	2 - Apr - Jun
+	3 - Jul - Sep
+	4 - Oct - Dec
+
+EX:
+SQL> SELECT TO_CHAR(SYSDATE,'Q') FROM DUAL;
+
+T
+-
+3
+
+Week Format:
+--------------------------
+WW - Week Of The Year
+W - Week Of Month
+
+EX:
+SQL> SELECT TO_CHAR(SYSDATE,'WW W') FROM DUAL;
+
+TO_C
+----
+31 5
+
+Time Format:
+-------------------------
+HH - 12 Hrs format
+HH24- 24 Hrs Format
+MI - Minute Part
+SS - Seconds Part
+Am / Pm - Am Tme (Or) Pm Tim
+
+EX:
+SQL> SELECT TO_CHAR(SYSDATE,'HH HH24 MI SS AM') FROM DUAL;
+
+TO_CHAR(SYSDAT
+--------------
+03 15 02 38 PM
+
+ii) TO_DATE():
+==============
+	- convert char type to date type should be in oracle default
+date format.
+
+syntax:
+========
+	to_date(string)
+
+Ex:
+SQL> SELECT TO_DATE('22/JULY/2022') FROM DUAL;
+
+TO_DATE('
+---------
+22-JUL-22
+
+SQL> SELECT TO_DATE('22/JULY/2022')+10 FROM DUAL;
+
+TO_DATE('
+---------
+01-AUG-22
+
+ii) multiple row functions:
+===========================
+	- is also called as "aggregative functions / grouping functions".
+	- sum(),avg(),min(),max(),count().
+
+sum():
+======
+	- return total value.
+
+syntax:
+=======
+	sum(<column name>)
+
+Ex:
+SQL> SELECT SUM(SAL) FROM EMP;
+SQL> SELECT SUM(SAL) FROM EMP WHERE DEPTNO=10;
+
+avg():
+======
+	- return average of total value.
+
+EX:
+SQL> SELECT AVG(SAL) FROM EMP;
+
+min():
+======
+	- return minimum value.
+
+EX:
+SQL> SELECT MIN(SAL) FROM EMP;
+SQL> SELECT MIN(HIREDATE) FROM EMP;
+
+max():
+======
+	- return maximum value.
+
+EX:
+EX:
+SQL> SELECT MAX(SAL) FROM EMP;
+SQL> SELECT MAX(HIREDATE) FROM EMP;
+
+COUNT():
+========
+	i) count(*)
+	ii) count(column name)
+	iii) count(distinct <column name>)
+
+EX:
+SQL> SELECT * FROM TEST;
+
+       SNO NAME
+---------- ----------
+         1 A
+         2 B
+         3
+         4 C
+         5 A
+         6 B
+
+i) count(*):
+============
+	- counting all rows including duplicate and nulls in 
+a table.
+
+ex:
+SQL> SELECT COUNT(*) FROM TEST;
+
+  COUNT(*)
+----------
+         6
+
+
+ii) count(column name):
+=======================
+	- counting all values including duplicates but not null
+ in a column .
+
+EX:
+SQL> SELECT COUNT(NAME) FROM TEST;
+
+COUNT(NAME)
+-----------
+          5
+
+iii) count(distinct column name):
+================================
+	- counting unique values in a column.
+
+EX:
+SQL> SELECT COUNT(DISTINCT NAME) FROM TEST;
+
+COUNT(DISTINCTNAME)
+-------------------
+                  3
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+			
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

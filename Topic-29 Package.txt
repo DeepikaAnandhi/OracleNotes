@@ -1,0 +1,360 @@
+EX:
+create a SF to return the no.of employees are joined in 
+between the given two dates?
+SQL> CREATE OR REPLACE FUNCTION SF3(SD DATE,ED DATE)
+  2  RETURN NUMBER
+  3  AS
+  4  v_NOEMP NUMBER(10);
+  5  BEGIN
+  6  SELECT COUNT(*) INTO v_NOEMP FROM EMP
+  7  WHERE HIREDATE BETWEEN SD AND ED;
+  8  RETURN v_NOEMP;
+  9  END;
+ 10  /
+
+Function created.
+
+SQL> SELECT SF3('01-JAN-81','31-DEC-81') FROM DUAL;
+
+SF3('01-JAN-81','31-DEC-81')
+----------------------------
+                          10
+
+EX:
+create a SF to accept employee number and return that employee
+gross salary based on the following conditions are
+		i) HRA -------- 10%
+		ii) DA -------- 20%
+		iii) PF ------- 10%.
+
+SQL> CREATE OR REPLACE FUNCTION SF4(p_EMPNO NUMBER)
+  2  RETURN NUMBER
+  3  AS
+  4  v_BSAL NUMBER(10);
+  5  v_HRA NUMBER(10);
+  6  v_DA NUMBER(10);
+  7  v_PF NUMBER(10);
+  8  v_GROSS NUMBER(10);
+  9  BEGIN
+ 10  SELECT SAL INTO v_BSAL FROM EMP WHERE EMPNO=p_EMPNO;
+ 11  v_HRA := v_BSAL*0.1;
+ 12  v_DA := v_BSAL*0.2;
+ 13  v_PF := v_BSAL*0.1;
+ 14  v_GROSS := v_BSAL+v_HRA+v_DA+v_PF;
+ 15  RETURN v_GROSS;
+ 16  END;
+ 17  /
+
+Function created.
+
+SQL> SELECT SF4(7788) FROM DUAL;
+
+ SF4(7788)
+----------
+      4200
+
+EX:
+SQL> SELECT OBJECT_NAME FROM USER_OBJECTS
+     WHERE OBJECT_TYPE='FUNCTION';
+
+SQL> SELECT TEXT FROM USER_SOURCE WHERE NAME='SF1';
+
+SYNTAX TO DROP A FUNCTION:
+==========================
+SQL> DROP FUNCTION SF1;
+
+3) PACKAGE:
+===========
+	- it is collection of varibles,stored procedures and stored 
+functions are in a single unit of memory.
+	- to improve the performance of accessing data from an 
+application.
+	- packages are also providing reusability of code and 
+supporting to implementing function overloading mechanism
+in oracle database.
+	- to create a package we need to follow the following
+two blocks those are,
+			i) package specification block
+			ii) package implementation block(body)
+
+i) package specification block:
+================================
+	- in this block we can delare varibales,stored procedures
+and stored functions.
+
+syntax:
+=======
+create [or replace] package <pname>
+is/as
+<declare variables>;
+<declare stored procedures>;
+<declare stored functions>;
+end;
+/
+
+ii) package implementation block(body)
+======================================
+	-in this block we can implementing logical code of 
+store procedures and stored functions which was declared
+in package specification block.
+
+syntax:
+=======
+create [or replace] package body <pname>
+is/as
+<implementing procedure logical code>
+<implementing funciton logical code>;
+end;
+/
+
+How to call a stored procedure from a package:
+===============================================
+syntax:
+=======
+execute <pname>.<procedure name>(value/(s));
+
+How to call a stored function from a package:
+=============================================
+syntax:
+=======
+select <pname>.<fname>(value/(s)) from dual;
+
+EX:
+create a package to bind multiple stored procedures?
+SQL> CREATE OR REPLACE PACKAGE PK1
+  2  IS
+  3  PROCEDURE SP1;
+  4  PROCEDURE SP2;
+  5  END;
+  6  /
+
+Package created.
+
+SQL> CREATE OR REPLACE PACKAGE BODY PK1
+  2  IS
+  3  PROCEDURE SP1
+  4  AS
+  5  BEGIN
+  6  DBMS_OUTPUT.PUT_LINE('I AM PROCEDURE1');
+  7  END SP1;
+  8  PROCEDURE SP2
+  9  AS
+ 10  BEGIN
+ 11  DBMS_OUTPUT.PUT_LINE('I AM PROCEDURE2');
+ 12  END SP2;
+ 13  END;
+ 14  /
+
+Package body created.
+
+SQL> EXECUTE PK1.SP1;
+I AM PROCEDURE1
+
+PL/SQL procedure successfully completed.
+
+SQL> EXECUTE PK1.SP2;
+I AM PROCEDURE2
+
+PL/SQL procedure successfully completed.
+
+EX:
+create a package to bind stored procedure and stored function
+along with a variable?
+
+SQL> CREATE OR REPLACE PACKAGE PK2
+  2  IS
+  3  X NUMBER(10):=5000;
+  4  PROCEDURE SP1;
+  5  FUNCTION SF1(A NUMBER) RETURN NUMBER;
+  6  END;
+  7  /
+
+Package created.
+
+SQL> CREATE OR REPLACE PACKAGE BODY PK2
+  2  IS
+  3  PROCEDURE SP1
+  4  AS
+  5  A NUMBER(10);
+  6  BEGIN
+  7  A:=X/2;
+  8  DBMS_OUTPUT.PUT_LINE(A);
+  9  END SP1;
+ 10  FUNCTION SF1(A NUMBER)
+ 11  RETURN NUMBER
+ 12  AS
+ 13  BEGIN
+ 14  RETURN X*A;
+ 15  END SF1;
+ 16  END;
+ 17  /
+
+Package body created.
+
+SQL> EXECUTE PK2.SP1;
+2500
+
+PL/SQL procedure successfully completed.
+
+SQL> SELECT PK2.SF1(2) FROM DUAL;
+
+PK2.SF1(2)
+----------
+     10000
+
+HOW TO IMPLEMENT FUNCTION OVERLOADING BY USING PACKAGE:
+=======================================================
+	- when no.of arguments are changed to the same function then
+we called as function overloading.
+
+		Ex:
+				function sf1(x number,y number);
+				function sf1(a number,b number,c number);
+
+SOLUTION:
+=========
+SQL> CREATE OR REPLACE PACKAGE PK3
+  2  AS
+  3  FUNCTION F1(X NUMBER,Y NUMBER) RETURN NUMBER;
+  4  FUNCTION F1(A NUMBER,B NUMBER,C NUMBER) RETURN NUMBER;
+  5  END;
+  6  /
+
+SQL> CREATE OR REPLACE PACKAGE BODY PK3
+    AS
+    FUNCTION F1(X NUMBER,Y NUMBER)
+    RETURN NUMBER
+    AS
+    BEGIN
+    RETURN (X*Y);
+    END F1;
+    FUNCTION F1(A NUMBER,B NUMBER,C NUMBER)
+   RETURN NUMBER
+   AS
+   BEGIN
+   RETURN (A+B+C);
+   END F1;
+   END;
+   /
+SQL> SELECT PK3.F1(10,20,30) FROM DUAL;
+
+PK3.F1(10,20,30)
+----------------
+              60
+
+SQL> SELECT PK3.F1(10,20) FROM DUAL;
+
+PK3.F1(10,20)
+-------------
+          200
+
+EX:
+SQL> SELECT OBJECT_NAME FROM USER_OBJECTS WHERE OBJECT_TYPE='PACKAGE';
+SQL> SELECT TEXT FROM USER_SOURCE WHERE NAME='PK1';
+
+SYNTAX TO DROP A PACKAGE BODY:
+==============================
+SYNTAX:
+========
+DROP PACKAGE BODY <PACKAGE NAME>;
+
+EX:
+DROP PACKAGE BODY PK1;
+
+NOTE: IN THE ABOVE SYNTAX WE CAN DROP PACKAGE BODY BUT NOT PACKAGE SPECIFICATION
+	  BLOCK.
+
+SYNTAX TO DROP A PACKAGE:
+=========================
+SYNTAX:
+======
+DROP PACKAGE <PACKAGE NAME>;
+
+EX:
+DROP PACKAGE PK1;
+
+NOTE: IN THE ABOVE SYNTAX WE CAN DROP THE ENTIRE PACKAGE I.E PACKAGE 
+SPECIFICATION BLOCK AND ALSO PACKAGE BODY.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

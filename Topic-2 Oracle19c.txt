@@ -1,0 +1,425 @@
+13-07-2022:			topic2: Oracle19c
+===========			==================
+What is oracle:
+===============
+- oracle is a rdbms(ordbms) product from oracle corporation.
+- is used to store data/information permanently along with
+  security.
+- the first version of oracle s/w is oracel 1.0(1979).
+		from 1.0.......................19c.(very latest version oracle21c).
+
+Working with oracle:
+=====================
+	- oracle s/w is having in two editions
+			1) oracle express edition 
+					> partial supports features.
+			ex:
+			recyclebin,flashback,purge,partition table.....etc
+
+			2) oracle enterprise edition
+					> fully supports(all features)
+
+How to download oralce19c enterprise edition:
+=============================================
+https://www.oracle.com/in/database/technologies/
+oracle19c-windows-downloads.html
+
+How to installing oracle19c enterprise edition:
+===============================================
+	hardware & software req:	ram - 1 gb 
+						   			  rom(hd)-500gb
+							         operating system - windows10,11,.. 	
+										  micro processor - any 
+
+NOTE:
+=====
+	- once we installed oracle s/w internally there are two components
+are installed.
+						1. client component
+						2. server component
+
+1. client component:
+====================
+	- there are 3 operations can perform,
+				step1: connect to oracle db server.
+				step2: send request to oracle db server.
+				step3: get response from oracle db server.
+
+	Ex: sqlplus,toad,sqldeveloper,pl/sql developer,....etc
+
+2. server component:
+====================
+	- it is having two more sub components,
+			i) instance
+			ii) database
+
+i) instance:
+============
+	- it is temporary memory.
+	- is allocating from RAM by your system.
+	- data can be stored temporarly.
+
+ii) database:
+==============
+	- it is permanent memory.
+	- is allocating from harddisk by your system.
+	- data can be stored permanently.
+
+NOTE:
+=====
+		- NOW A USER WANT TO WORK ON ORACLE DB THEN WE FOLLOW THE FOLLOWING
+2 STPES PROCEDURE.
+								1. CONNECT
+										- SQLPLUS
+
+								2. COMMUNICATE
+										- SQL
+
+SQLPLUS vs SQL:
+===============
+			SQLPLUS 								SQL
+			=======									====
+1. it db client tool.						1. it is a db language
+
+2. introduced by oracle					2. introduced by IBM.
+corporation.
+
+3. it will act as an editor				3. is having sub languages 
+for write & execute sql queries.		those are DDL,DML,DQL/DRL,TCL,DCL
+														are used to perform some operations
+														over database.
+
+4. it is used to connect to 			4. it is used to communicate with 
+oracle db server.								database.
+
+HOW TO CONNECT TO ORACLE DB SERVER:
+===================================
+	- go to all programs 
+			- go to sqlplus icon
+					- click on sqlplus
+								enter username : system(default user)
+								enter password : tiger (case sensitive)
+								connected.
+
+problems of Conneting to oracle:
+=================================
+problem-1:
+==========
+	- open sqlplus
+			Enter user-name: system/tiger
+			ERROR:
+			ORA-12560: TNS:protocol adapter error
+
+solution:
+=========
+	- go to services 
+			- go to oracleserviceORCL 
+					- click on it
+							- select 'startup type' is automatic
+										- click on start buttom
+													- click on apply 
+																- click on ok
+problem-2:
+==========
+	- open sqlplus
+				Enter user-name: system/tiger
+				ERROR:
+				ORA-28000: The account is locked.
+
+solution:
+=========
+	- go to open sqlplus
+				Enter user-name: \sys as sysdba
+				Enter password : sys
+				connected.
+
+syntax to unlock a user:
+========================
+syntax:
+=======
+ALTER USER <USERNAME> ACCOUNT UNLOCK;
+
+EX:
+SQL> ALTER USER SYSTEM ACCOUNT UNLOCK;
+User altered.
+
+SQL> CONN
+Enter user-name: system/tiger
+Connected.
+
+HOW TO CREATE A NEW USERNAME & PASSWORD IN ORACLE:
+==================================================
+SYNTAX:
+=======
+CREATE USER <USERNAME> IDENTIFIED BY <PASSWORD>;
+
+EX:
+- go to open sqlplus
+			 Enter user-name: system/tiger
+			 Connected.
+
+sql> create user mydb2pm identified by 123;
+user created.
+
+Note: Every new user is called as dummy user(no rights) in 
+oracle.to activate this user then we need permission from 
+DBA(system).
+
+Ex:
+SQL> CONN(connect)
+Enter user-name: MYDB2PM
+Enter password:123
+ERROR:
+ORA-01045: user MYDB2PM lacks CREATE SESSION privilege; 
+logon denied
+
+HOW TO GRANT CONNECT PERMISSION TO MYDB2PM USER:
+================================================
+SYNTAX:
+========
+GRANT <PRIVILEGE NAME> TO <USERNAME>;
+
+EX:
+	conn
+	enter username : system /tiger
+	connected.
+
+EX:
+GRANT CONNECT TO MYDB2PM;
+
+SQL> CONN
+Enter user-name: MYDB2PM/123
+Connected.
+
+HOW TO CHANGE PASSWORD OF USER:
+===============================
+SQL> CONN
+Enter user-name: MYDB2PM/123
+Connected.
+
+SQL> PASSWORD
+Changing password for MYDB2PM
+Old password: 123
+New password: ABC
+Retype new password: ABC
+Password changed.
+
+SQL> CONN
+Enter user-name: MYDB2PM/ABC
+Connected.
+
+HOW TO RE CREATE A NEW PASSWORD,IF WE FORGOT?
+=============================================
+SYNTAX:
+=======
+ALTER USER <USERNAME> IDENTIFIED BY <NEW PASSWORD>;
+
+EX:
+Enter user-name: system/tiger
+Connected.
+SQL> ALTER USER MYDB2PM IDENTIFIED BY MYDB2PM;
+User altered.
+
+SQL> CONN
+Enter user-name: MYDB2PM/MYDB2PM
+Connected.
+
+HOW TO VIEW USERNAME,IF WE FORGOT?
+==================================
+SYNTAX:
+=======
+SELECT USERNAME FROM ALL_USERS;
+
+EX:
+SQL> CONN
+Enter user-name: system/tiger
+Connected.
+
+SQL> SELECT USERNAME FROM ALL_USERS;
+
+HOW TO DROP / DELETE A USER FROM ORACLE?
+=======================================
+SYNTAX:
+=======
+DROP USER <USERNAME> CASCADE;
+
+EX:
+DROP USER MYDB2PM CASCADE;
+================================================================
+							TOPIC-3 : SQL
+							==============
+	- it is a db language which is used to communicate with database.
+this language was introduced by IBM.
+	- sql language queries are not a case sensitive but every query 
+should ends with a semicolon(;).
+			Ex:
+				SELECT * FROM EMP;----EXECUTED
+				select * from emp;----executed
+				SeleCt * From Emp;----executed
+
+Sub-languages of SQL:
+=====================
+1.Data definition language(DDL):
+================================
+	- create
+	- alter 
+			> alter - modify
+			> alter - add
+			> alter - rename
+			> alter - drop
+	- rename
+	- truncate
+	- drop
+
+New features:
+=============
+	- recyclebin
+	- flashback
+	- purge
+
+2) Data manipulation language(DML):
+===================================
+	- insert
+	- update
+	- delete
+
+New features:
+=============
+	- insert all
+	- merge
+
+3) Data query / retrieval language(DQL/DRL):
+==============================================
+	- select
+
+4) Transactional control language(TCL):
+======================================
+	- commit
+	- rollback
+	- savepoint
+
+5) Data control language(DCL):
+==============================
+	- grant
+	- revoke
+
+admin for online students:
+=========================
+	MR.SHUBHAM
+	7337313415
+
+installation problems:
+======================
+	MR.raju
+	9032667219
+	time: 11.30am to 1.00pm
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+	
+
+
+	
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+						
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+	
+
+
+
+
+
+
+
+	
+
+
+
+
+
+
+

@@ -1,0 +1,161 @@
+MATERIALIZED VIEWS:
+===================
+ - mviews are created based on a base table just like a view.
+
+			View 							Mview
+			=====							=======
+1. is not store data					1. is storing data
+
+2. dependent object					2. independent object
+
+3. once we drop a base table		3. can accessable.
+then view can not be accessable.
+
+4. supporting dml operations.		4. not allowed dml operations.
+
+syntax:
+=======
+create materialized view <view name> as <select query>;
+
+EX:
+SQL> CREATE TABLE TEST1(SNO INT,NAME VARCHAR2(10));
+Table created.
+
+SQL> CREATE VIEW V11
+  2  AS
+  3  SELECT * FROM TEST1;
+View created.
+
+SQL> CREATE MATERIALIZED VIEW MV11
+  2  AS
+  3  SELECT * FROM TEST1;
+Materialized view created.
+
+TESTING:
+SQL> INSERT INTO TEST1 VALUES(101,'ALLEN');
+	
+	- once we insert data into a base table(test1) then the data
+can see in view(v11) also but we cannot see data in materialized
+view directly.
+	- if we want to see data in materialized view then we should
+refresh a materialized view by using the following two methods
+
+i) ON DEMAND:
+==============
+	- it is a default refreshing method of mview.
+
+syntax:
+=======
+execute dbms_mview.refresh('mview name');
+
+EX:
+EXECUTE DBMS_MVIEW.REFRESH('MV11');
+
+EX:
+SELECT * FROM MV11;
+
+
+ii) on commit:
+==============
+	- when we want to see data in mview after performing
+DML operations on a base table then we should commit
+those operations on a base table otherwise we cannot 
+see data in mview.
+
+syntax:
+=======
+create materialized view <view name>
+refresh on commit
+as
+<select query>;
+
+EX:
+SQL> CREATE TABLE EMP77(EID INT,ENAME VARCHAR2(10));
+Table created.
+
+SQL> CREATE VIEW V77 AS SELECT * FROM EMP77;
+View created.
+
+SQL> CREATE MATERIALIZED VIEW MV77
+  2  REFRESH ON COMMIT
+  3  AS
+  4  SELECT * FROM EMP77;
+
+ERROR at line 4:
+ORA-12054: cannot set the ON COMMIT refresh attribute for 
+the materialized view
+
+	- to overcome the above error then we should apply 
+primary key constraint on a base table like below,
+
+SQL> ALTER TABLE EMP77 ADD CONSTRAINT P_EID PRIMARY KEY(EID);
+Table altered.
+
+SQL> CREATE MATERIALIZED VIEW MV77
+  2  REFRESH ON COMMIT
+  3  AS
+  4  SELECT * FROM EMP77;
+Materialized view created.
+
+TESTING:
+SQL> INSERT INTO EMP77 VALUES(1,'WARD');
+1 row created.
+
+SQL> COMMIT;
+Commit complete.
+
+SQL> SELECT * FROM MV77;
+
+NOTE:
+====
+	- TO SEE ALL VIEWS IN ORACLE DB THEN WE USE THE FOLLOWING DATA DICTIONARY
+IS "USER_VIEWS".
+
+EX:
+SQL> DESC USER_VIEWS;
+SQL> SELECT VIEW_NAME FROM USER_VIEWS;
+
+NOTE: 
+=====
+	- TO VIEW THE TEXT OF A PARTICULAR VIEW IN ORACLE DB.
+EX:
+SQL> SELECT TEXT FROM USER_VIEWS WHERE VIEW_NAME='V1';
+
+SYNTAX TO DROP A VIEW:
+======================
+SQL> DROP VIEW <VIEW NAME>;
+
+EX:
+SQL> DROP VIEW V1;
+
+NOTE:
+====
+	- IF WE WANT TO SEE ALL MATERIALIZED VIEWS IN ORACLE DB THEN WE USE
+A DATADICTIONARY IS "USER_MVIEWS".
+
+EX:
+SQL> DESC USER_MVIEWS;
+SQL> SELECT MVIEW_NAME FROM USER_MVIEWS;
+
+SYNTAX TO DROP A MATERIALIZED VIEW:
+===================================
+SQL> DROP MATERIALIZED VIEW <VIEW NAME>;
+
+EX:
+SQL> DROP MATERIALIZED VIEW MV11;
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

@@ -1,0 +1,157 @@
+TRANSACTION CONTROL LANGUAGE(TCL):
+==================================
+	- Transactio is nothing but to perform some
+operation over database.
+	- to manage transactions over database the we use
+the following 3 commands are
+				1) commit
+				2) rollback
+				3) savepoint
+1) commit:
+==========
+	- this command is used to make a trnasaction is
+permanent.
+				i) implicit commit transactions
+				ii) explicit commit transactions
+
+i) implicit commit:
+===================
+	- these transactions are committed by system.
+			ex: ddl commands
+
+ii) explicit commit:
+====================
+	- these transactions are committed by user 
+as per our need.
+			ex: dml commands
+
+syntax:
+=======
+	commit;
+
+ex:
+create table branch(bcode int,bname varchar2(10),
+bloc varchar2(10));
+
+sql> insert into branch values(1021,'sbi','pune');
+sql> commit;
+
+sql> update branch set bloc='hyd' where bcode=1021;
+sql> commit;
+
+sql> delete from branch where bcode=1021;
+sql> commit;
+					(or)
+
+sql> insert into branch values(1021,'sbi','pune');
+sql> update branch set bloc='hyd' where bcode=1021;
+sql> delete from branch where bcode=1021;
+sql> commit;
+
+2) rollback:
+============
+	- to cancel a transaction.
+	- but once a transaction is commit then we cannot
+	rollback. 
+
+syntax:
+=======
+	rollback;
+
+Ex:
+SQL> DELETE FROM BRANCH WHERE BCODE=1021;
+SQL> ROLLBACK;
+
+3) SAVEPOINT:
+=============
+	- when we created a savepoint internally system
+is allocating a special memory to pointer in instance
+and will store row /rows which we rollback(cancel).
+
+syntax to create a savepoint:
+=============================
+syntax;
+======
+savepoint <pointer name>;
+
+syntax to rollback a savepoint:
+=================================
+syntax:
+========
+rollback to <pointer name>;
+
+ex:
+sql> delete from branch where bcode=1021;
+sql> delete from branch where bcode=1025;
+sql> savepoint p1;
+sql> delete from branch where bcode=1023;
+
+case1:
+sql> rollback to p1;------1023 row cancel
+
+case2:
+sql> commit / rollback
+
+ACID PROPERTIES:
+================
+- by default all databases are having ACID properties to 
+maintain accurate and consistency data.
+
+A-atomicity:
+============
+	> atomic = single 
+
+	> x-customer a/c:10000
+
+withdraw transaction:
+=====================
+						ATM
+						====
+			> insert atm card
+			> select lang
+			> select banking
+			> select withdraw
+			> enter amount : 3000
+			> select save / curr
+			> enter pinno
+			> yes(commit) / no(rollback)
+
+C-consistency:
+==============
+ex:
+x-customer a/c:10000---->transfer----> y a/c:5000
+		   debit 3000 ----------------> credit 3000
+			============                   ==========
+					7000                         8000
+					 3000
+			=============
+				10000
+
+I-isolation:
+=============
+	- every transaction is independent.
+
+D-durability:
+=============
+	- 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

@@ -1,0 +1,163 @@
+cluster:
+========
+	- it is collection of tables together saved in 
+same datablock memory.
+	- to improve the performance of joins.
+	- when we create cluster tables then those tables
+should a common column name.
+	- cluster can create at the time of creating tables.
+	- when we create a cluster object then we follow
+the following 3 steps:
+
+step1: create a cluster:
+========================
+syntax:
+======
+create cluster <cluster name>(common column name <dt>)
+
+step2: create an index object on a cluster:
+===========================================
+syntax:
+======
+create index <index name> on cluster <cluster name>;
+
+step3: create cluster tables:
+=============================
+syntax:
+=======
+create table <tn>(<col1> <dt>[size],..............)
+cluster <cluster name>(common column name);
+
+EX:
+SQL> CREATE CLUSTER EMP_DEPT(DEPTNO INT);
+
+Cluster created.
+
+SQL> CREATE INDEX CI ON CLUSTER EMP_DEPT;
+
+Index created.
+
+SQL> CREATE TABLE EMP1(EID INT,ENAME VARCHAR2(10),DEPTNO INT)
+  2  CLUSTER EMP_DEPT(DEPTNO);
+
+Table created.
+
+SQL> CREATE TABLE DEPT1(DEPTNO INT,DNAME VARCHAR2(10))
+  2  CLUSTER EMP_DEPT(DEPTNO);
+
+Table created.
+
+SQL> INSERT INTO EMP1 VALUES(1,'A',10);
+
+1 row created.
+
+SQL> INSERT INTO EMP1 VALUES(2,'B',20);
+
+1 row created.
+
+SQL> COMMIT;
+
+Commit complete.
+
+SQL> INSERT INTO DEPT1 VALUES(10,'D1');
+
+1 row created.
+
+SQL> INSERT INTO DEPT1 VALUES(20,'D2');
+
+1 row created.
+
+SQL> COMMIT;
+
+Commit complete.
+
+SQL> SELECT * FROM EMP1;
+
+       EID ENAME          DEPTNO
+---------- ---------- ----------
+         2 B                  20
+         1 A                  10
+
+SQL> SELECT * FROM DEPT1
+  2  ;
+
+    DEPTNO DNAME
+---------- ----------
+        20 D2
+        10 D1
+
+SQL> SELECT ROWID FROM EMP1;
+
+ROWID
+------------------
+AAAR2hAAHAAAAGbAAA
+AAAR2hAAHAAAAGfAAA
+
+SQL> SELECT ROWID FROM DEPT1;
+
+ROWID
+------------------
+AAAR2hAAHAAAAGbAAA
+AAAR2hAAHAAAAGfAAA
+
+NOTE:
+=====
+	if we want to view clusters in oracle db then we use
+a datadictionary is called as "user_clusters".
+
+EX:
+SQL> DESC USER_CLUSTERS;
+SQL> SELECT CLUSTER_NAME FROM USER_CLUSTERS;
+
+CLUSTER_NAME
+--------------------------------------------------------------------------------------------------------------------------------
+EMP_DEPT
+
+NOTE:
+=====
+	- to view tables in a cluster memory then we use a 
+datadictionary is called as "user_tables".
+
+EX:
+SQL> DESC USER_TABLES;
+SQL> SELECT TABLE_NAME FROM USER_TABLES
+  2  WHERE CLUSTER_NAME='EMP_DEPT';
+
+TABLE_NAME
+--------------------------------------------------------------------------------------------------------------------------------
+EMP1
+DEPT1
+
+HOW TO DROP A CLUSTER:
+======================
+SYNTAX:
+=======
+DROP CLUSTER <CLUSTER NAME>;
+
+EX:
+SQL> DROP CLUSTER EMP_DEPT;
+ERROR at line 1:
+ORA-00951: cluster not empty
+
+	- to drop a cluster when it has tables then use 
+"including tables" statement along with drop command.
+
+SYNTAX:
+=======
+DROP CLUSTER <CLUSTER NAME> INCLUDING TABLES;
+
+EX:
+SQL> DROP CLUSTER EMP_DEPT INCLUDING TABLES;
+Cluster dropped.
+
+
+
+
+
+
+
+
+
+
+
+

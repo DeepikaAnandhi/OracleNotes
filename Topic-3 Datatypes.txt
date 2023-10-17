@@ -1,0 +1,216 @@
+					Datatypes in Oracle
+					===================
+
+	- it is an attribute which will specify what type
+of data is storing into a column.
+					i) numeric datatypes
+					ii) string / character datatypes
+					iii) long datatype
+					iv) date datatypes
+					v) raw & long raw datatypes
+					vi) lob datatypes
+
+i) numeric datatypes:
+=====================
+			I) int
+			II) number(p,s)
+I) int:
+=======
+	- storing integer format data only.
+				
+	Ex:
+		sno int -----> convert -----> sno number(38)
+
+II) number(p,s):
+================
+	- storing integer & float values.
+			number(p) : storing integer values only.
+			number(p,s) : storing float values only.
+
+precision(p):
+=============
+	- counting all digits including left side & right side
+of a decimal expression.
+
+			Ex:
+				i)	76.23
+				precision = 4
+
+				ii) 9879.45
+				precision = 6
+
+scale(s):
+=========
+	- counting the right side digits only.
+
+		Ex:
+				i)	76.23
+				precision = 4
+				scale = 2
+
+				ii) 9879.452
+				precision = 7
+				scale = 3
+
+ii) string / character datatypes:
+=================================
+	- storing string format data only.
+	- it can represent with '<string>'.
+
+	Ex:
+						empname char(10)
+						----------------
+	smith------> error
+	'smith'----> allowed
+	123 -------> error
+	'123'------> allowed
+
+							string format data
+											|
+		characters only				alphanumeric 
+			string 								string
+					|											|
+	(a-z (or) A-Z)					( a-z / A-Z , 0-9,
+	ex: 'smith','SMITH',..		@,#,$,%,&,_,.....etc)
+													ex: 'sai123@gmail.com',
+													'ADH7570Q','Skk@12',...etc
+
+	- there are two types of character datatypes,
+			1) Non-unicode datatypes
+					- storing localized data.(english lang.only)
+								i) char(size)
+								ii) varchar2(size)
+			2) Unicode datatypes
+					- storing globalized data.(all national lang's)
+								i) Nchar(size)
+								ii) Nvarchar2(size)
+					- here "N" stands for "national lang".
+
+													
+									
+
+
+
+
+
+
+admin for online students:
+=========================
+	MR.SHUBHAM
+	7337313415
+
+installation problems:
+======================
+	MR.raju
+	9032667219
+	time: 11.30am to 1.00pm
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+	
+
+
+	
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+						
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+	
+
+
+
+
+
+
+
+	
+
+
+
+
+
+
+

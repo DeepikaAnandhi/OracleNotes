@@ -1,0 +1,351 @@
+DEMO-1					ORACLE19c
+======					=========
+
+What is Oracle?
+===============
+	- it is a RDBMS(relational database management system)
+	product / DB software / Back end tool.
+	- this tool is used to develop backend application.
+
+Backend application:
+====================
+	- is an application where we can store data/information.
+
+Where we want to use DB:
+========================
+	> Banking
+	> University
+	> Hospital
+	> Transport
+	> HR management
+	> Sales & Production....etc
+
+What is Database?
+=================
+	- it is a memory where we can,
+			- store 
+			- process
+			- share
+			- security
+
+Who want to learn db?
+=====================
+	- any platform / any person
+
+What are prerequisites:
+=======================
+	- no
+
+DEMO-2:
+=======
+course name	 : oracle19c
+duration		 : 50 - 60 sessions
+time				 : 2:15pm - 3.40pm(class) + 20 mints(doubts)
+course type 	 : offline & online 
+
+Notes:
+======
+	- every topic wise running notes(.txt)
+	and main notes(.pdf).
+	- google class room---> by nareshit
+
+End of the course:
+==================
+	- complete oracle19c material(.pdf)
+	- IQs(100+)
+	- Examples on booklet(200+)+class notes(150+)=400 examples
+	- resume models(exp & frsh)
+	- oracle course certificate from nareshit.
+
+In oracle course:
+=================
+		topic1: DBMS
+		topic2: Oracle
+		topic3: SQL 
+		topic4: de-normalization & normalization
+		topic5: PL/SQL
+		topic6: Dynamic SQL
+====================================================
+11-07-2022			Topic-1 : DBMS		
+==========			===============
+
+What is Data ?
+==============
+	- it is a rawfact.(characters,numbers,special char's...etc).
+	- it is not giving any meaningfull statements.
+
+	Ex:
+			10021			ALLEN
+			10022			JONES
+			10023			WARNER
+
+What is Information ?
+=====================
+	- processing data is called as information.
+	- always provide meaningfull statements.
+
+	Ex:
+			CustId  	CustName
+			=====			========
+			10021			ALLEN
+			10022			JONES
+			10023			WARNER
+
+What is Database ?
+==================
+	- it is a collection of inter related data/information
+is stored in a praticular system i.e table.
+
+inter related data/information:
+===============================
+	Bank_DB(SBI):
+	==============
+		- branches
+				- dept's
+						- emp's
+		- customers
+		
+	Ex:
+			no employees = no dept
+			no dept = no employees
+	Ex:
+			no customers = no products
+			no products = no customers
+	
+Types of Databases?
+====================
+	- there are two types of databases in real world.
+				1. OLTP(online transaction  processing)
+				2. OLAP(online analytical processing)
+
+1. OLTP:
+========
+	- storing "day-to-day" transactional data/information
+	for a running organization/company.
+
+	- live transactional operations are 
+	insert,update,delete and small operations of select(small data reading).
+
+		Ex: oracle,sqlserver,mysql,db2,......etc
+
+Ex:
+	x-customer : open new a/c on 12-04-2018.
+
+day-1(12-04-2018):
+=================
+		deposite transaction:
+		=====================
+				trans id  : xxxxx0978987
+				date      : 12-04-2018
+				time		   : 11:30:23am
+				amount		: 10000/-
+				to a/c 		: xxxxx90798697
+				status		: success / fail
+
+2.OLAP:
+======
+	- storing the historical(big data) data/information.
+	- reading operation(select)
+	Ex: Datawarehouse
+
+What are Datastorage?
+=====================
+	- it is a location where we can store data/infromation.
+						1. papers & books
+								> before computers
+						2. flatfiles(textfile)
+								> after computers
+						3. DBMS (s/w)
+
+flatfiles:
+==========
+	- it is used to data / information in files with
+help of operating system.
+
+Disadavantages:
+===============
+	i) Data redundancy
+	ii) Data inconsistency
+	iii) Data retrieval(reading)
+	iv) Data security
+	v) Data integrity
+	vi) Data indexing
+
+i) Data redundancy:
+===================
+	- we can store same data / information in no.of
+files in computer.
+
+ii) Data inconsistency:
+=======================
+	- confusion data
+
+iii) Data retrieval(reading):
+=============================
+	- to retrieval the required data from a file 
+is very difficult.
+	- we need to develop an application by using 
+	high level programming languages(c,c++,java,.net,...)
+
+				file handling
+						i/o 
+						write
+						read 
+
+iv) Data security:
+==================
+	- not a security.
+
+v) Data integrity:
+==================
+	- to check data is valid / invalid.
+	- flatfiles are not allowed integrity rules.
+
+vi) Data indexing:
+===================
+	- to access the data fastly.
+	- files are not allowed index mechanism.
+
+What is DBMS?
+=============
+	- it is a s/w which is used to manage and maintain data/
+information in database.
+	- by dbms we can perform the following operations over database.
+					> create database memory
+					> inserting data
+					> updating data
+					> selecting data
+					> deleting data
+
+Ex:
+	 User <--------> DBMS s/w <---------> Database
+
+Why DBMS?
+=========
+	- to reduce data redundancy.
+	- to avoid data inconsistency.
+	- easy to access data.
+	- easy manipulate data.
+	- to retrieving data fastly.
+	- to maintain data integrity rules.
+	- providing security.
+	- supporting indexing mechanism.
+	- supporting "ACID" properties to manage transactions.
+	
+Models of DBMS:
+===============
+	1) Hierarchical database management system(HDBMS)
+				Ex: IMS (information management system)
+	
+	2) Network database management system(NDBMS)
+				Ex: IDBMS (integrated database management system)
+
+	Note: these two models are outdated.
+
+	3) Relational database management system(RDBMS)
+
+		i) Object relational DBMS(ORDBMS)
+		=================================
+			- data can be stored in form of "table"(i.e rows & columns).
+					table : collection of rows & columns
+					row   : group of columns
+			- row / record / tuple
+			- column / field / attribute
+			- are completely depends on "SQL" language.
+
+		Ex: Oracle,Sqlserver,Mysql,Db2,sybase,.......etc
+
+		ii) Object oriented DBMS(OODBMS)
+		================================
+			- data can be stored in form of "objects".
+			- depends on "OOPS" concept.
+			- no need "sql" thats'y we called as "NOSQL" database.
+		Ex: MongoDB,Cassandra,.....etc
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+	
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+ 
+
+
+
+
+
+
+
+
+
+
+
+	
+	
+
+
+			
+
+			
+
+
+
+
+
+
+
+
+ 
+ 
+
+	

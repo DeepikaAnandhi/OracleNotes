@@ -1,0 +1,300 @@
+INDEXES:
+========
+	- indexes are used to retrieving the required row data from 
+a table fastly.
+
+	- database index object is similar to index page in textbook.
+however by using index page we can access the required topic
+from a text book fastly same as by using index object we can 
+retrieve the required row data from a table fastly.
+
+	- a db index object can be created on column/(s) and this
+column is called as "indexed key column".
+
+	- whenever we want to access a row data from a table then 
+ue should use an "indexed column" in where clause condition
+otherwise indexes are not working.
+
+
+			eid int(index)		ename varchar2(10) (no index)
+			==============		==============================
+ex:
+select * from t where ename='smith';---- indexes are not working
+select * from t where eid=1021;---- indexes are working
+
+	- all databases are supporting the following two types of searching
+mechanisms those are,
+
+				1. table scan
+				2. index scan
+
+1. table scan:
+==============
+	- it is a default searching mechanism in database.
+	- it will searching the entire table(top-bottom) for 
+required data purpose.
+
+Ex:
+SQL> SELECT * FROM EMP WHERE SAL=3000;---performing table scan by default.
+
+       SAL
+----------
+       800
+      1600
+      1250
+      2975
+      1250
+      2850	--------> sal=3000 (comparing 14 rows in a table)
+      2450									 (14 rows x 1 sec = 14sec)
+      3000
+      5000
+      1500
+      1100
+       950
+      3000
+      1300
+
+2. index scan:
+==============
+	- in this scan oracle db server is searching based on indexed column
+for required row data.
+	- we can create an index object on particular columns in a table in two ways
+					1. implicit indexes
+					2. explicit indexes
+
+1. implicit indexes:
+=====================
+	- these indexes are created by system automatically when we created a table 
+along with unique / primary key constraint.
+
+Ex:
+SQL> CREATE TABLE TEST22(SNO INT UNIQUE,SNAME VARCHAR2(10));
+SQL> CREATE TABLE TEST33(EID INT PRIMARY KEY,SAL NUMBER(10));
+
+NOTE:
+====
+	- to view index name along with column name of a particular table in oracle 
+DB then we use a datadictionary is called as "user_ind_columns".
+
+EX:
+SQL> DESC USER_IND_COLUMNS;
+SQL> SELECT COLUMN_NAME,INDEX_NAME FROM USER_IND_COLUMNS
+  2  WHERE TABLE_NAME='TEST22';
+
+COLUMN_NAME										INDEX_NAME
+--------------------------------------------------------------------------------------------------------------------------------
+SNO												SYS_C007702
+
+SQL> SELECT COLUMN_NAME,INDEX_NAME FROM USER_IND_COLUMNS
+  2  WHERE TABLE_NAME='TEST33';
+
+COLUMN_NAME										INDEX_NAME
+--------------------------------------------------------------------------------------------------------------------------------
+EID												SYS_C007703	
+
+2. explicit indexes:
+=====================
+	- these indexes are created by user.
+
+syntax:
+=======
+create index <index name> on <tn>(<column name>);
+	
+	- there are two types of indexes are created on a table.
+					1. B-tree index (default indexes)
+							> simple index
+							> composite index
+							> unique index
+							> functional based index
+					2. Bitmap index
+
+simple index:
+=============
+	- when we created an index object based on a single column.
+
+syntax:
+========
+create index <index name> on <tn>(column name);
+
+EX:
+SQL> CREATE INDEX I1 ON EMP(SAL);
+SQL> SELECT * FROM EMP WHERE SAL=3000;
+
+									b-TREE INDEX
+									=============
+								 (LP)<|3000|>=(RP) ----------ROOT LEVEL
+											|
+			(LP) <|2975|>=(RP)			(LP) < |5000| >=(RP) ---- PARENT LEVEL
+			
+				|								  |
+2850|*,2459|*,1600|*,					3000|*,*------CHILD LEVEL (HERE "*" IS NOTHING BUT ROWID)
+1500|*,1300|*,1250|*,*
+1100|*,950|*,800|*
+
+COMPOSITE INDEX:
+=================
+	- when we created an index object based on multiple columns.
+
+syntax:
+=======
+create index <index name> on <tn>(<col1>,<col2>,........);
+												|
+											index scan 
+										is perform based 
+										on leading column.
+
+EX:
+SQL> CREATE INDEX I2 ON EMP(DEPTNO,JOB);
+
+TESTING:
+SQL> SELECT * FROM EMP WHERE DEPTNO=10;----------------------INDEX SCAN
+SQL> SELECT * FROM EMP WHERE DEPTNO=10 AND JOB='MANAGER';-----INDEX SCAN
+SQL> SELECT * FROM EMP WHERE JOB='MANAGER';----------TABLE SCAN
+
+UNIQUE INDEX:
+==============
+	- WHEN WE CREATED AN INDEX OBJECT BASED ON "UNIQUE" CONSTRAINT.
+	- UNIQUE INDEXED COLUMN IS NOT ALLOWED DUPLICATE VALUES SO THAT SEARCHING 
+	TIME IS REDUCE AND IMPROVE THE PERFORMANCE OF DATABASE.
+
+SYNTAX:
+=======
+CREATE UNIQUE INDEX <INDEX NAME> ON <TN>(<COLUMN NAME>);
+
+
+EX:
+SQL> CREATE UNIQUE INDEX UI ON DEPT(DNAME);
+
+TESTING:
+INSERT INTO DEPT VALUES(50,'SALES','HYD')
+ERROR at line 1:
+ORA-00001: unique constraint (MYDB2PM.UI) violated
+
+functional based index:
+========================
+	- when we created an index object based on function name.
+
+syntax:
+=======
+create index <index name> on <tn>(<function name>(column name));
+
+EX:
+SQL> CREATE INDEX FI ON EMP(UPPER(ENAME));
+
+TESTING:
+SQL> SELECT * FROM EMP WHERE ENAME='smith';---NO INDEX
+SQL> SELECT * FROM EMP WHERE ENAME='SMITH';---INDEX ACTIVATED
+
+2. Bitmap index:
+================
+	- created based on "low cardinality of column".
+
+
+cardinality:
+============
+	- it refer uniqueness of data values in a column.
+
+syntax to find out cardinality of column:
+=========================================
+syntax:
+=======
+cardinality of column = no.of distinct values in a column
+						=====================================
+						  no.of rows in a table
+
+Ex:
+cardinality of empno = 14 / 14 ---------> 1(HIGH CARDINALITY)
+
+cardinality of JOB = 05/14--------------> 0.35 (LOW CARDINALITY)
+
+SYNTAX:
+========
+CREATE BITMAP INDEX <INDEX NAME> ON <TN>(COLUMN NAME);
+
+EX:
+SQL> CREATE BITMAP INDEX BI ON EMP(JOB);
+
+EX:
+SQL> SELECT * FROM EMP WHERE JOB='CLERK';
+
+NOTE:
+=====
+	- when we created a bitmap index object on a particular column internally
+system will generate a bitmap index table with bit numbers 1 (or) 0.here
+"1" is represent condition is true and "0" is represent condition is false.
+
+							bitmap indexed table
+							====================
+
+======================================================================================================================
+JOB			||	1	||	2	||	3	||	4	||	5	||	6	||	7	||	8	||	9	||	10 ||	11	||	12	||	13	||	14	||
+=======================================================================================================================
+clerk		||	1	||	0	||	0	||	0	||	0	||	0	||	0	||	0	||	0	||	0	||	1	||	1	||	0	||	1	||
+========================================================================================================================						
+
+					here "1" ---------- rowid
+
+note:
+======
+	- if we want to view all indexes in a oracle db then we use a datadictionary
+is called as "user_indexes".
+
+SQL> DESC USER_INDEXES;
+SQL> SELECT INDEX_NAME,INDEX_TYPE FROM USER_INDEXES
+  2  WHERE TABLE_NAME='EMP';
+
+INDEX_NAME										INDEX_TYPE
+------------									-----------
+FI												FUNCTION-BASED NORMAL(B-TREE INDEX)
+BI												BITMAP
+I1												NORMAL(B-TREE INDEX)
+
+				
+SYNTAX TO DROP AN INDEX OBJECT:
+================================
+DROP INDEX <INDEX NAME>;
+
+EX:
+DROP INDEX I1;
+DROP INDEX BI;
+				
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+			
+
+		

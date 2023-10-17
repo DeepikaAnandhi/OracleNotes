@@ -1,0 +1,674 @@
+OPERATORS:
+==========
+	- to perform some operation on the given operand values.
+
+				i) assignment operator		=>		=
+				ii) arithmetic operator	=>		+ , - ,* , /
+				iii) relational operators =>	<,>,<=,>=,!=(or)<>
+				iv) logical operators		=> 	AND,OR,NOT
+				v) set operators				=>		union,union all,intersect,minus
+				
+				vi) special operators		=> 	(+ve)				(-ve)
+																======			======
+																In					Not In
+																Between			Not Between
+																Is null			Is not null
+																Like 				Not Like
+
+i) assignment operator:
+=======================
+	- to assign a value to variable / attribute.
+
+syntax:
+=======	
+		<column name> <assignment operator> <value>
+
+ex:
+select * from emp where sal=12000;
+update emp set sal=24000 where job='clerk';
+delete from emp where deptno=20;
+
+ii) arithmetic operators:
+=========================
+	- to perform addition,subtraction,multiple and division.
+
+syntax:
+=======
+	<column name> <arithmetic operator> <value>
+
+Ex:
+waq to display all employees salaries after adding 1000/-?
+SQL> SELECT SAL OLD_SALARY,SAL+1000 NEW_SALARY FROM EMP;
+
+Ex:
+waq to display empno,ename,salary and annual salary of the 
+employees who are working under deptno is 20?
+SQL> SELECT EMPNO,ENAME,SAL BASIC_SALARY,SAL*12 ANNUAL_SALARY
+  2  FROM EMP WHERE DEPTNO=20;
+
+Ex:
+waq to display all employees salaries after increment of 10%?
+SQL> SELECT ENAME,SAL BEFORE_INCREMENT,
+	   SAL+SAL*10/100 AFTER_INCREMENT
+      FROM EMP;
+					(OR)
+SQL> SELECT ENAME,SAL BEFORE_INCREMENT,
+	   SAL+SAL*0.1 AFTER_INCREMENT
+      FROM EMP;
+
+Relational operators:
+=====================
+	- comparing a specific column values with user defined 
+conditional value.
+
+syntax:
+=======
+	where <column name> <relational operator> <value>;
+
+Ex:
+waq to display employees whose salary is more than 1500?
+SQL> SELECT * FROM EMP WHERE SAL>1500;
+
+Ex:
+waq to display employees who are joined before 1981?
+SQL> SELECT * FROM EMP WHERE HIREDATE < '01-JAN-81';
+
+Ex:
+waq to display employees who are joined after 1981?
+SQL> SELECT * FROM EMP WHERE HIREDATE > '31-DEC-81';
+
+Logical operators:
+==================
+	- to check more than one condition in the query.
+	- AND,OR,NOT 
+
+AND:
+====
+	- it return a value if both conditions are true in the query.
+
+cond1		cond2
+=====		======
+t			t	------- t
+t			f	------- f
+f			t	------- f
+f			f  ------  f
+
+syntax:
+========
+	where <condition1> and <condition>
+
+Ex:
+waq to display employee whose name is "allen" and working as a 
+"salesman"?
+SQL> SELECT * FROM EMP WHERE ENAME='ALLEN' AND JOB='SALESMAN';
+
+OR:
+===
+	- it return a value if any one condition is true from the query.
+
+cond1		cond2
+=====		=====
+	t		t		----- t
+	t    f		----- t
+	f		t		----- t
+	f		f		----- f
+
+syntax:
+========
+	where <condition1> or <condition2>
+
+Ex:
+waq to display employees whose empno is 7369,7566,7788?
+SQL> SELECT * FROM EMP WHERE EMPNO=7369 OR EMPNO=7566 OR EMPNO=7788;
+
+NOTE:
+=====
+	- AND operator working on same row in a table.
+	- OR  operator working on different rows in a table.
+
+NOT:
+====
+	- it returns all values except conditional values in the query.
+syntax:
+=======
+	where not <cond1> and not <cond2> and not.....
+
+Ex:
+waq to display employees who are not working as a "clerk" and 
+"salesman" ?
+SQL> SELECT * FROM EMP WHERE NOT JOB='CLERK' AND NOT JOB='SALESMAN';
+
+SET OPERATORS:
+==============
+	- are used to combined the results of two select queries as 
+a single set of values.
+
+syntax:
+=======
+	<select query1> <set operator> <select query2>;
+
+Ex:
+			A={10,20,30}		B={30,40,50}
+
+UNION:
+======
+	- combined two sets values without duplicates.
+
+	A u B = {10,20,30,40,50}
+
+UNION ALL:
+==========
+	- combined two sets values with duplicates.
+
+	A ul B = {10,20,30,30,40,50}
+
+INTERSECT:
+==========
+	- it returns common values from both sets.
+
+	A i B = {30}
+
+MINUS:
+======
+	- it returns uncommon values from left set but not right set.
+
+	A-B = {10,20}
+	B-A = {40,50}
+
+
+Ex:
+								Nareshit
+									 |
+						emp_hyd			emp_chennai
+
+EX_TABLES:
+===========
+SQL> SELECT * FROM EMP_HYD;
+
+       EID ENAME             SAL
+---------- ---------- ----------
+         1 ALLEN           85000
+         2 JONES           72000
+         3 WARD            55000
+
+SQL> SELECT * FROM EMP_CHENNAI;
+
+       EID ENAME             SAL
+---------- ---------- ----------
+         1 ALLEN           85000
+         4 MILLER          38000
+         5 SCOTT           48000
+
+Ex:
+waq to display all employees details who wroking in narestit?
+SQL> SELECT * FROM EMP_HYD UNION ALL SELECT * FROM EMP_CHENNAI;
+						(OR)
+SQL> SELECT * FROM EMP_HYD UNION SELECT * FROM EMP_CHENNAI;
+
+Ex:
+waq to display employees who are working in both branches?
+SQL> SELECT * FROM EMP_HYD INTERSECT SELECT * FROM EMP_CHENNAI;
+
+Ex:
+waq to display employees who are working in hyd but not in chennai
+branch?
+SQL> SELECT ENAME FROM EMP_HYD MINUS SELECT ENAME FROM EMP_CHENNAI;
+
+BASIC RULES:
+============
+	- no.of columns should be same in both select queries.
+	- order of columns and datatypes of columns must be match.
+
+SPECIAL OPERATORS:
+==================
+IN:
+===
+	- comparing the list of values with in a single condition.
+
+syntax:
+========
+	where <column name> in(value1,value2,.....);
+
+Ex:
+waq to display employees whose empno is 7369,7566,7788?
+SQL> SELECT * FROM EMP WHERE EMPNO IN(7369,7566,7788);
+
+Ex:
+waq to display employees whose empno is not 7369,7566,7788?
+SQL> SELECT * FROM EMP WHERE EMPNO NOT IN(7369,7566,7788);
+
+BETWEEN:
+========
+	- to work on a particular range value.
+
+syntax:
+=======
+where <column name> between <low value> and <high value>;
+
+note:
+=====
+1.it returns all values including source  and destination values.
+2.it can apply on low to high value only.
+3.it work with "and" operator only.
+
+Ex:
+waq to display employees whose salary is between 1500 to 3000?
+SQL> SELECT * FROM EMP WHERE SAL BETWEEN 1500 AND 3000;
+
+Ex:
+waq to display employees who are joined in 1981?
+SQL> SELECT * FROM EMP WHERE HIREDATE BETWEEN '01-JAN-81' AND '31-DEC-81';
+
+Ex:
+waq to display employees who are not joined in 1981?
+SQL> SELECT * FROM EMP WHERE HIREDATE NOT BETWEEN '01-JAN-81' AND '31-DEC-81';
+
+IS NULL:
+========
+	- comparing nulls in a table.
+
+syntax:
+========
+	where <column name> is null;
+
+What is null:
+=============
+	- it is a unknow / undefined value in db.
+	- it is a empty cell.
+	- null != 0 & null != space
+
+Ex:
+waq to display employees whose commission is undefined?
+SQL> SELECT * FROM EMP WHERE COMM IS NULL;
+
+Ex:
+waq to display employees whose commission is defined?
+SQL> SELECT * FROM EMP WHERE COMM IS NOT NULL;
+
+Ex:
+waq to display empno,ename,sal,comm and also salary+comm
+from emp table whose ename is "smith"?
+SQL> SELECT EMPNO,ENAME,SAL,COMM,SAL+COMM FROM EMP 
+     WHERE ENAME='SMITH';
+
+     EMPNO ENAME             SAL       COMM   SAL+COMM
+---------- ---------- ---------- ---------- ----------
+      7369 SMITH             800
+
+NOTE:
+=====
+	if any arithmetic operator is performing some operation with 
+null then it again returns null only.
+
+	Ex:
+			if x=100;
+			i) x+null --->100+null----> null
+			ii) x-null ---> 100-null---> null
+			iii) x*null ---> 100*null---> null
+			iv) x/null	-----> 100/null---> null
+
+	- to overcome tha above problem then we use a pre-defined 
+function is called as "NVL()".
+
+NVL(exp1,exp2):
+===============
+	- it is pre-defined function.
+	- stands for "null value".
+	- is used to assign a user defined value inplace of null(empty).
+	- is having two arguments are expression1 and expression2.
+
+				if exp1 is null----> return exp2 value(UD value)
+				if exp1 is not null---> return exp1 value only.
+
+Ex:
+SQL> SELECT NVL(NULL,0) FROM DUAL;
+
+NVL(NULL,0)
+-----------
+          0
+
+SQL> SELECT NVL(NULL,100) FROM DUAL;
+
+NVL(NULL,100)
+-------------
+          100
+
+SQL> SELECT NVL(0,100) FROM DUAL;
+
+NVL(0,100)
+----------
+         0
+
+SQL> SELECT NVL(200,100) FROM DUAL;
+
+NVL(200,100)
+------------
+         200
+
+SOLUTION:
+=========
+SQL> SELECT EMPNO,ENAME,SAL,COMM,SAL+NVL(COMM,0) FROM EMP 
+     WHERE ENAME='SMITH';
+
+     EMPNO ENAME             SAL       COMM SAL+NVL(COMM,0)
+---------- ---------- ---------- ---------- ---------------
+      7369 SMITH             800                        800
+
+NVL2(EXP1,EXP2,EXP3):
+=====================
+	- it is an extension of NVL().
+	- having 3 arguments exp1,exp2,exp3.
+				if exp1 is null -------> returns exp3 value(UD value)
+				if exp1 is not null----> returns exp2 value(UD value)
+
+Ex:
+SQL> SELECT NVL2(NULL,100,200) FROM DUAL;
+
+NVL2(NULL,100,200)
+------------------
+               200
+
+SQL> SELECT NVL2(500,100,200) FROM DUAL;
+
+NVL2(500,100,200)
+-----------------
+              100
+
+EX:
+waq to update all employees commissions in a table based on 
+the following conditions are
+	i) if employee comm is null then update those employees 
+		 commissions with 800.
+	ii) if employee comm is not null then update those employees
+		 commissions with comm+600.
+
+SQL> UPDATE EMP SET COMM=NVL2(COMM,COMM+600,800);
+
+LIKE:
+=====
+	- comparing a specific string character pattern.
+	- when we use like operator we should use the following
+	wildcard operators are,
+		i) %		=> to represent the remaining group of char's
+						after selected char.
+		ii) _		=> counting a single character in the expression.
+
+syntax:
+=======
+where <column name> like '<wildcard operator> <specific string char.pattern> <wildcard operator>';
+
+
+Ex:
+to display employees whose name starts with "s"?
+select * from emp where ename like 's%';
+
+				s			%	
+				===		===
+				s			mith
+				s			ai
+				s			cott
+				s			umit
+				s			uresh
+				s			uman
+
+EX:
+to diplay employees whose name ends with "N"?
+SQL> SELECT * FROM EMP WHERE ENAME LIKE'%N';
+
+EX:
+to display employees whose name is having 'I'?
+SQL> SELECT * FROM EMP WHERE ENAME LIKE'%I%';
+
+EX:
+to display employee whose is having 4 char's?
+SQL> SELECT * FROM EMP WHERE ENAME LIKE'____';
+Ex:
+to display employees whose name is having 3 char's?
+select * from emp where ename like '___'
+				
+ex:
+				smith
+				sai
+				scott
+				sumit
+				suresh
+				suman
+
+ex:
+to display employee whose name second character is 
+" O "?
+SQL> SELECT * FROM EMP WHERE ENAME LIKE '_O%';
+
+EX:
+to display employee whose empno starts with 7 and 
+ends with 8?
+SQL> SELECT * FROM EMP WHERE EMPNO LIKE '7%8';
+
+EX:
+to display employees who are joined in 1981?
+SQL> SELECT * FROM EMP WHERE HIREDATE LIKE '%81';
+
+EX:
+to display employees who are joined in month of 
+"december"?
+SQL> SELECT * FROM EMP WHERE HIREDATE LIKE '%DEC%';
+
+EX:
+to display employees who are joined in month of 
+"june" or "december"?
+SQL> SELECT * FROM EMP WHERE HIREDATE LIKE '%JUN%'
+  2  OR HIREDATE LIKE '%DEC%';
+
+LIKE OPERATOR WITH SPECIAL CHAR'S:
+==================================
+SQL> SELECT * FROM TEST;
+
+ENAME             SAL
+---------- ----------
+SMI_TH          12000
+%WARD           25000
+MILL@ER         32000
+_JONES          41000
+WAR%NER         63000
+ADAM#S          55000
+
+EX:
+to display employees whose name is having "@"
+symbol?
+SQL> SELECT * FROM TEST WHERE ENAME LIKE '%@%';
+
+EX:
+to display employees whose name is having "#"
+symbol?
+SQL> SELECT * FROM TEST WHERE ENAME LIKE '%#%';
+
+EX:
+to display employees whose name is having "_"
+symbol?
+SQL> SELECT * FROM TEST WHERE ENAME LIKE '%_%';
+
+NOTE:
+=====
+	- generally oracle server is treating %,_ as
+a wildcard operators but as a special characters
+so to overcome this problem we should use a special
+keyword is called as "escape'\'".
+
+solution:
+SQL> SELECT * FROM TEST WHERE ENAME LIKE '%\_%'escape'\';
+
+EX:
+to display employees whose name is having "%"
+symbol?
+SQL> SELECT * FROM TEST WHERE ENAME LIKE '%\%%'escape '\';
+
+ex:
+to display employees whose name is not starts with 
+"S"?
+SQL> SELECT * FROM EMP WHERE ENAME NOT LIKE 'S%';
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+				
+
+
+
+
+	
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+	
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+													
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

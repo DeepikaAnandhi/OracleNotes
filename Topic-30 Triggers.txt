@@ -1,0 +1,430 @@
+4) TRIGGERS:
+===========
+	- it is named block similar to stored procedure but executed(called)
+by system automatically.
+
+purpose of triggers:
+===================
+	- to raise alerts along with security.
+	- to control / restricted  ddl,dml operations based on some
+	business logical conditions.
+	- to validating of data
+	- for auditing 
+
+Types of triggers:
+==================
+		1. DML triggers 
+		2. DDL triggers (DB triggers)
+
+
+1. DML triggers:
+================
+	- when we created a trigger object based on DML commands
+(insert,update,delete) then we called as "dml trigger".
+	- these triggers are executed by system automatically when we
+perform DML operations on a particular table.
+
+syntax:
+=======
+create [or replace] trigger <trigger name>
+before / after insert or update or delete on <table name / object name>
+[for each row]-----used in row level triggers only
+begin
+<trigger body / statements>;
+end;
+/
+
+
+BEFORE EVENT:
+=============
+	- When we created a trigger with "before event" then,
+
+			first : executed  trigger body
+			later : executed DML command.
+
+
+AFTER EVENT:
+=============
+	- When we created a trigger with "after event" then,
+
+			first : executed  DML command.
+			later : executed  trigger body.
+
+NOTE:
+=====
+	- BOTH EVENTS TRIGGERS ARE PROVIDING SAME RESULT.
+
+
+LEVELS OF TRIGGERS:
+====================
+	- trigger can be created at two levels.
+			1. row level triggers
+			2. statement level triggers
+
+
+1. row level triggers:
+======================
+	- in this level a trigger body is executing for each row wise in a table.
+so that we should use a clause statement is "for each row".
+
+Ex:
+
+SQL> SELECT * FROM TEST;
+
+ENAME             SAL
+---------- ----------
+SMITH           15000
+ALLEN           25000
+WARD            15000
+JONES           31000
+
+EX:
+SQL> CREATE OR REPLACE TRIGGER TR1
+  2  AFTER UPDATE ON TEST
+  3  FOR EACH ROW
+  4  BEGIN
+  5  DBMS_OUTPUT.PUT_LINE('HELLO');
+  6  END;
+  7  /
+
+Trigger created.
+
+TESTING:
+SQL> UPDATE TEST SET SAL=12000 WHERE SAL=15000;
+HELLO
+HELLO
+2 rows updated.
+
+2. statement level triggers:
+============================
+	- in this level a trigger body is executing only one time for a DML operation.
+
+EX:
+SQL> CREATE OR REPLACE TRIGGER TR1
+  2  AFTER UPDATE ON TEST
+  3  BEGIN
+  4  DBMS_OUTPUT.PUT_LINE('HAI');
+  5  END;
+  6  /
+
+Trigger created.
+
+SQL> UPDATE TEST SET SAL=8000 WHERE SAL=12000;
+HAI
+
+2 rows updated.
+
+BIND VARIABLES:
+===============
+	- these are just like normal varibales.which are used to store the value
+while inserting,updating and deleting data from a table.there are two types of
+bind variables are,
+
+1) :NEW :-
+========
+	- when we insert new values into a table those new values are storing under 
+:new bind variable.
+
+syntax:
+=======
+			:new.<column name> = <value>
+
+2) :OLD :-
+========
+	- when we delete old values from a table those old values are storing under
+:old bind variable.
+
+syntax:
+=======
+			:old.<column name> = <value>
+
+NOTE:
+=====
+	- thess bind variables are used in "row level triggers only".
+
+Ex.on to raise alerts along with security:
+==========================================
+SQL> CREATE OR REPLACE TRIGGER TRALERT
+    AFTER INSERT ON TEST
+    BEGIN
+    RAISE_APPLICATION_ERROR(-20458,'SOME ONE INSERTING ROW INTO YOUR TABLE.PLZ CHECK!!!');
+    END;
+    /
+
+TESTING:
+INSERT INTO TEST VALUES('MILLER',45000)'        
+ERROR at line 1:
+ORA-20458: SOME ONE INSERTING ROW INTO YOUR TABLE.PLZ CHECK!!!
+
+EX:
+CREATE OR REPLACE TRIGGER TRALERT
+    AFTER UPDATE ON TEST
+    BEGIN
+    RAISE_APPLICATION_ERROR(-20458,'SOME ONE UPDATING ROW INTO YOUR TABLE.PLZ CHECK!!!');
+    END;
+    /
+
+TESTING:
+UPDATE TEST SET SAL=12000 WHERE SAL=8000
+ERROR at line 1:
+ORA-20458: SOME ONE UPDATING ROW INTO YOUR TABLE.PLZ CHECK!!!
+
+EX:
+CREATE OR REPLACE TRIGGER TRALERT
+    AFTER DELETE ON TEST
+    BEGIN
+    RAISE_APPLICATION_ERROR(-20458,'SOME ONE DELETING ROW FROM YOUR TABLE.PLZ CHECK!!!');
+    END;
+    /
+
+TESTING:
+DELETE FROM TEST WHERE ENAME='WARD'
+ERROR at line 1:
+ORA-20458: SOME ONE DELETING ROW FROM YOUR TABLE.PLZ CHECK!!!
+
+							(OR)
+EX:
+CREATE OR REPLACE TRIGGER TRALERT
+    AFTER INSERT OR UPDATE OR DELETE ON TEST
+    BEGIN
+    RAISE_APPLICATION_ERROR(-20458,'SOME ONE PERFORMING DML OPERATION ON YOUR TABLE.PLZ CHECK!!!');
+    END;
+    /
+TESTING:
+INSERT INTO TEST VALUES('MILLER',45000);
+UPDATE TEST SET SAL=12000 WHERE SAL=8000'
+DELETE FROM TEST WHERE ENAME='WARD';
+ERROR at line 1:
+ORA-20458: SOME ONE PERFORMING DML OPERATION ON YOUR TABLE.PLZ CHECK!!!
+
+EX.on to control / restricted  dml operations based on some
+	business logical conditions:
+============================================================
+Ex:
+create a trigger to restricted all DML operations on a table on every thursday?
+SQL> CREATE OR REPLACE TRIGGER TRDAY
+  2  BEFORE INSERT OR UPDATE OR DELETE ON TEST
+  3  BEGIN
+  4  IF TO_CHAR(SYSDATE,'DY') = 'THU' THEN
+  5  RAISE_APPLICATION_ERROR(-20147,'WE CANNOT PERFORM DML OPERATIONS ON TEST TABLE
+  6  ON THURSDAY');
+  7  END IF;
+  8  END;
+  9  /
+
+Trigger created.
+
+TESTING
+SQL> DELETE FROM TEST WHERE ENAME='WARD';
+ERROR at line 1:
+ORA-20147: WE CANNOT PERFORM DML OPERATIONS ON TEST TABLE ON THURSDAY
+
+EX:
+create a trigger to restricted all DML operations on a table in between
+9am to 5pm ?
+SQL> CREATE OR REPLACE TRIGGER TRTIME
+  2  AFTER INSERT OR UPDATE OR DELETE ON TEST
+  3  BEGIN
+  4  IF TO_CHAR(SYSDATE,'HH24') BETWEEN 9 AND 16 THEN
+  5  RAISE_APPLICATION_ERROR(-20584,'INVALID TIME');
+  6  END IF;
+  7  END;
+  8  /
+
+TESTING
+SQL> DELETE FROM TEST WHERE ENAME='SMITH';
+ERROR at line 1:
+ORA-20584: INVALID TIME
+
+LOGIC:
+======
+		9AM(9) = 9:00:00AM TO 9:59:59AM------COMES UNDER 9 O CLOCK
+		5PM(17) = 5:00:00PM TO 5:59:59PM-----UPTO 6 O CLOCK
+		4PM(16) = 4:00:00PM TO 4:59:59PM -----UPTO 5 O CLOCK
+
+
+Ex.on to validating of data:
+============================
+create a trigger to control insert operation on a table if 
+new salary is less than to 5000?
+SQL> CREATE OR REPLACE TRIGGER TRIN
+  2  AFTER INSERT ON EMP11
+  3  FOR EACH ROW
+  4  BEGIN
+  5  IF :NEW.SAL<5000 THEN
+  6  RAISE_APPLICATION_ERROR(-20478,'NEW SAL SHOULD NOT BE LESS
+  7  THAN TO 5000');
+  8  END IF;
+  9  END;
+ 10  /
+
+TESTING:
+SQL> INSERT INTO EMP11 VALUES('SMITH',4500);----NOT ALLOWED
+SQL> INSERT INTO EMP11 VALUES('SMITH',6000);----ALLOWED
+
+EX:
+create a trigger to control delete operation on table if we 
+try to delete the employee "smith" details from a table?
+SQL> CREATE OR REPLACE TRIGGER TRDEL
+  2  BEFORE DELETE ON EMP11
+  3  FOR EACH ROW
+  4  BEGIN
+  5  IF :OLD.ENAME='SMITH' THEN
+  6  RAISE_APPLICATION_ERROR(-20369,'NOT ALLOWED');
+  7  END IF;
+  8  END;
+  9  /
+
+Trigger created.
+
+TESTING:
+SQL> DELETE FROM EMP11 WHERE ENAME='SCOTT';---ALLOWED
+SQL> DELETE FROM EMP11 WHERE ENAME='SMITH';---NOT ALLOWED
+
+EX.on auditing:
+===============
+what is auditing?
+=================
+	- when we perform some operations on a table those operational
+values are stored into an other table is called as "auditing 
+table".
+
+EX:
+SQL> CREATE TABLE EMP12(EID INT,ENAME VARCHAR2(10),SAL NUMBER(10));
+SQL> CREATE TABLE EMP12_AUDIT(EID INT,AUDIT_INFOR VARCHAR2(100));
+
+SQL> CREATE OR REPLACE TRIGGER TRAUDIT
+    AFTER INSERT ON EMP12
+    FOR EACH ROW
+    BEGIN
+    INSERT INTO EMP12_AUDIT VALUES(:NEW.EID,
+    'SOME ONE INSERTED A NEW ROW INTO YOUR TABLE
+    ON:'||TO_CHAR(SYSDATE,'DD-MON-YYYY HH24:MI:SS AM'));
+    END;
+    /
+
+TESTING:
+SQL> INSERT INTO EMP12 VALUES(1021,'SMITH',25000);
+SQL> SELECT * FROM EMP12;
+
+       EID ENAME             SAL
+---------- ---------- ----------
+      1021 SMITH           25000
+
+SQL> SELECT * FROM EMP12_AUDIT;
+
+       EID AUDIT_INFOR
+---------- ----------------------------------------------------------------------------------------------------
+      1021 SOME ONE INSERTED A NEW ROW INTO YOUR TABLE
+           ON:30-SEP-2022 15:01:56 PM
+
+EX:
+CREATE OR REPLACE TRIGGER TRAUDIT
+    AFTER UPDATE ON EMP12
+    FOR EACH ROW
+    BEGIN
+    INSERT INTO EMP12_AUDIT VALUES(:OLD.EID,
+    'SOME ONE UPDATED A ROW INTO YOUR TABLE
+    ON:'||TO_CHAR(SYSDATE,'DD-MON-YYYY HH24:MI:SS AM'));
+    END;
+	/
+EX:
+CREATE OR REPLACE TRIGGER TRAUDIT
+    AFTER DELETE ON EMP12
+    FOR EACH ROW
+    BEGIN
+    INSERT INTO EMP12_AUDIT VALUES(:OLD.EID,
+    'SOME ONE DELETED A ROW FROM YOUR TABLE
+    ON:'||TO_CHAR(SYSDATE,'DD-MON-YYYY HH24:MI:SS AM'));
+    END;
+	/
+
+2) DDL TRIGGERS / DB TRIGGERS:
+==============================
+	- when we create a trigger on DDL operations(create,alter,
+rename,drop) then we called as DDL triggers.
+	- these triggers are executed by system automatically when
+we perform ddl operations on a particular user database schema.
+so that ddl triggers are also called as "db triggers".
+
+syntax:
+========
+create [or replace] trigger <trigger name>
+after / before create or alter or rename or drop 
+on username.schema
+begin
+<trigger body / statements>;
+end;
+/
+
+Ex:
+create a trigger to restricted create operation on mydb2pm
+user schema?
+SQL> CREATE OR REPLACE TRIGGER TRDDL
+  2  AFTER CREATE ON MYDB2PM.SCHEMA
+  3  BEGIN
+  4  RAISE_APPLICATION_ERROR(-20589,'WE CANNOT PERFORM
+  5  CREATE OPERATION ON MYDB2PM DATABASE SCHEMA');
+  6  END;
+  7  /
+
+Trigger created.
+
+SQL> CREATE TABLE T12(SNO INT);---NOT ALLOWED
+
+SYNTAX TO DROP A TRIGGER:
+=========================
+DROP TRIGGER <TRIGGER NAME>;
+
+EX:
+DROP TRIGGER TRDDL;
+DROP TRIGGER TRDEL;
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

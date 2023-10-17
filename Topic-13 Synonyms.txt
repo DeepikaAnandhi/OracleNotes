@@ -1,0 +1,175 @@
+SYNONYM:
+========
+	- it is a db object which is used to create 
+a permanent alias name / alternate name for the 
+db objects / table.
+
+purpose of synonym:
+====================
+purpose-1: to reduce length table names.
+========================================
+	Ex:	COLLEGE_ENROLLMENT_DETAILS
+
+	SELECT * FROM COLLEGE_ENROLLMENT_DETAILS;
+	INSERT INTO COLLEGE_ENROLLMENT_DETAILS VALUES();
+	UPDATE COLLEGE_ENROLLMENT_DETAILS SET .....;
+	DELETE FROM COLLEGE_ENROLLMENT_DETAILS......;
+
+	EX:
+	CREATE SYNONYM S1 FOR COLLEGE_ENROLLMENT_DETAILS;
+		
+	SELECT * FROM S1;
+	INSERT INTO S1 VALUES();
+	UPDATE S1 SET .....;
+	DELETE FROM S1......;
+
+purpose-2 : HIDING OWNERNAME AND OBJECT NAME(TABLE)
+===================================================
+	EX:
+	SELECT * FROM SYSTEM.DEPT;
+	CREATE SYNONYM S2 FOR SYSTEM.DEPT;
+	GRANT SELECT ON S2 TO U22;
+
+	CONN U22/U22
+	SELECT * FROM S2;
+
+TYPES OF SYNONYMS:
+==================
+	1. private synonyms
+	2. public synonyms
+
+1. private synonyms:
+=====================
+	-these synonyms are created by user who are having permission.
+
+syntax:
+======
+create synonym <synonym name> for [ownername].<table name>;
+
+EX:
+sql> conn system/tiger
+sql> create user a identified by a;
+sql> grant connect,create table,unlimited tablespace to a;
+
+sql> conn a/a
+SQL> CREATE TABLE COLLEGE_ENROLLMENT_DETAILS
+  2  (STID INT,SNAME VARCHAR2(10),BNAME VARCHAR2(10));
+Table created.
+
+SQL> INSERT INTO COLLEGE_ENROLLMENT_DETAILS
+  2  VALUES(1021,'SMITH','EEE');
+
+SQL> CREATE SYNONYM S1 FOR COLLEGE_ENROLLMENT_DETAILS
+ERROR at line 1:
+ORA-01031: insufficient privileges
+
+SQL> CONN
+Enter user-name: system/tiger
+Connected.
+SQL> grant create synonym to a;
+Grant succeeded.
+
+SQL> CONN
+Enter user-name: A/A
+Connected.
+SQL> CREATE SYNONYM S1 FOR COLLEGE_ENROLLMENT_DETAILS;
+Synonym created.
+
+SQL> SELECT * FROM S1;
+
+NOTE:
+=====
+	- if we want to view synonym name,table name
+and table owner name on a praticular table in 
+oracle db then we use the following datadictionary
+is called as "user_synonyms".
+
+EX:
+sql> desc user_synonyms;
+SQL> SELECT SYNONYM_NAME,TABLE_NAME,TABLE_OWNER
+  2  FROM USER_SYNONYMS;
+
+SYNONYM_NAME			TABLE_NAME						TABLE_OWNER
+--------------------------------------------------------------------------------
+S1					COLLEGE_ENROLLMENT_DETAILS			A
+
+
+How to drop a private synonym:
+==============================
+syntax:
+=======
+DROP SYNONYM <SYNONYM NAME>;
+
+EX:
+DROP SYNONYM S1;
+
+2. public synonyms:
+===================
+	- these synonyms are created by DBA to hide ownername and 
+table name from users.
+
+syntax:
+=======
+create public synonym <synonym name> for [ownername].<table name>;
+
+EX:
+SQL> conn
+Enter user-name: system/tiger
+SQL> CREATE PUBLIC SYNONYM PS1 FOR SYSTEM.DEPT;
+Synonym created.
+
+SQL> GRANT SELECT ON PS1 TO A,B,C;
+Grant succeeded.
+
+SQL> CONN
+Enter user-name: A/A
+Connected.
+SQL> SELECT * FROM PS1;
+
+SQL> CONN
+Enter user-name: B/B
+Connected.
+SQL> SELECT * FROM PS1;
+
+SQL> CONN
+Enter user-name: C/C
+Connected.
+SQL> SELECT * FROM PS1;
+
+NOTE:
+=====
+	- if we want view all synonyms in oracle database then we
+use a datadictionary is "all_synonyms".
+
+EX:
+SQL> DESC ALL_SYNONYMS;
+SQL> SELECT SYNONYM_NAME,TABLE_NAME,TABLE_OWNER
+  2  FROM ALL_SYNONYMS WHERE TABLE_NAME='DEPT';
+
+SYNONYM_NAME		TABLE_NAME					TABLE_OWNER
+--------------------------------------------------------------------------------
+PS1					DEPT							SYSTEM
+
+
+HOW TO DROP A PUBLIC SYNONYM:
+=============================
+SYNTAX:
+=======
+DROP PUBLIC SYNONYM <SYNONYM NAME>;
+
+EX:
+DROP PUBLIC SYNONYM PS1;
+
+
+
+
+
+
+
+
+
+
+
+
+
+

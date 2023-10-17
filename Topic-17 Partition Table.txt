@@ -1,0 +1,165 @@
+PARTITION TABLE:
+================
+	1. RANGE PARTITION
+	2. LIST PARTITION
+	3. HASH PARTITION
+
+1. RANGE PARTITION:
+===================
+	- created a partition table based on a particular
+range value.
+
+syntax:
+=======
+create table <tn>(<column name1> <dt>[size],......)
+partition by range(column name)
+(partition <partition name1> values less than(value),
+partition <partition name2> values less than(value),
+...................................................
+..................................................
+);
+
+EX:
+SQL> CREATE TABLE EMP11(EID INT
+  2  ,ENAME VARCHAR2(10),SAL NUMBER(10))
+  3  PARTITION BY RANGE(SAL)
+  4  (PARTITION P1 VALUES LESS THAN(500),
+  5  PARTITION P2 VALUES LESS THAN(1000),
+  6  PARTITION P3 VALUES LESS THAN(2000));
+
+Table created.
+
+SQL> INSERT INTO EMP11 VALUES(1,'SMITH',1800);
+1 row created.
+
+SQL> INSERT INTO EMP11 VALUES(2,'ALLEN',450);
+1 row created.
+
+............................................;
+
+HOW TO CALL A PARTICULAR PARTITION FROM A TABLE:
+================================================
+SYNTAX:
+=======
+SELECT * FROM <TN> PARTITION(PARTITION NAME);
+
+EX:
+SQL> SELECT * FROM EMP11 PARTITION(P1);
+
+ii) LIST PARTITION:
+===================
+	- CREATED PARTITION TABLE BASED ON THE LIST OF VALUES.
+
+SYNTAX:
+=======
+CREATE TABLE <TN>(<COL1> <DT>[SIZE],..................)
+PARTITION BY LIST(COLUMN NAME)
+(PARTITION <PARTITION NAME1> VALUES (V1,V2,......),
+PARTITION <PARTITION NAME2> VALUES (V1,V2,.......),
+..................................................
+..................................................
+PARTITION OTHERS VALUES(DEFAULT));
+
+EX:
+SQL> CREATE TABLE STUDENT11(CID INT,CNAME VARCHAR2(10),STID INT)
+  2  PARTITION BY LIST(CNAME)
+  3  (PARTITION P1 VALUES('ORACLE','MSSQL','MYSQL'),
+  4  PARTITION P2 VALUES('JAVA','.NET'),
+  5  PARTITION OTHERS VALUES(DEFAULT)
+  6  );
+Table created.
+
+SQL> INSERT INTO STUDENT11 VALUES(1,'JAVA',1021);
+SQL> INSERT INTO STUDENT11 VALUES(2,'C',1022);
+SQL> INSERT INTO STUDENT11 VALUES(3,'ORACLE',1023);
+
+HOW TO CALL A PARTICULAR PARTITION FROM A TABLE:
+================================================
+EX:
+SQL> SELECT * FROM STUDENT11 PARTITION(OTHERS);
+
+iii) HASH PARTITION:
+====================
+	- CREATED PARTITION TABLE BASED ON HASH ALGORITHM BY SYSTEM BY DEFAULT.
+	- HERE SYSTEM WILL CREATE PARTITIONS BASED ON USER REQUEST.
+
+SYNTAX:
+======
+CREATE TABLE <TN>(<COL1> <DT>[SIZE],.........)
+PARTITION BY HASH(COLUMN NAME) PARTITIONS <NUMBER>;
+
+SQL> CREATE TABLE EMP12(ENAME VARCHAR2(10),
+  2  SAL NUMBER(10))PARTITION BY HASH(SAL)
+  3  PARTITIONS 5;
+
+NOTE:
+=====
+	- IF WE WANT TO VIEW PARTITIONS OF A PARTICULAR TABLE IN ORACLE DB
+THEN WE USE A DATADICTIONARY IS CALLED AS "USER_TAB_PARTITIONS".
+
+EX:
+SQL> DESC USER_TAB_PARTITIONS;
+SQL> SELECT PARTITION_NAME FROM USER_TAB_PARTITIONS
+  2  WHERE TABLE_NAME='EMP12';
+
+PARTITION_NAME
+--------------------------------------------------------------------------------------------------------------------------------
+SYS_P953
+SYS_P954
+SYS_P955
+SYS_P956
+SYS_P957
+
+HOW TO ADD A NEW PARTITION TO AN EXISTING TABLE:
+================================================
+SYNTAX FOR RANGE PARTITION:
+===========================
+ALTER TABLE <TN> ADD PARTITION <PARTITION NAME> VALUES LESS THAN(VALUE);
+
+SYNTAX FOR LIST PARTITION:
+=========================
+ALTER TABLE <TN> ADD PARTITION <PARTITION NAME> VALUES (V1,V2,.....);
+
+EX:
+SQL> ALTER TABLE EMP11 ADD PARTITION P4
+  2  VALUES LESS THAN(3000);
+
+HOW TO DROP A PARTITION FROM AN EXISTING TABLE:
+================================================
+SYNTAX:
+=======
+ALTER TABLE <TN> DROP PARTITION <PARTITION NAME>;
+
+EX;
+SQL> ALTER TABLE EMP11 DROP PARTITION P1;
+
+NOTE:
+	- IF WE WANT TO KNOW A TABLE IS PARTITIONED OR NOT THEN WE USE 
+A DATADICTIONARY IS CALLED AS "USER_TABLES".
+
+EX:
+SQL> DESC USER_TABLES;
+SQL> SELECT PARTITIONED FROM USER_TABLES
+  2  WHERE TABLE_NAME='EMP';
+
+PAR
+---
+NO
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

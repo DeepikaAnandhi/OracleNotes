@@ -1,0 +1,295 @@
+VIEWS:
+======
+	- is a virtual / logical / sub set of a base table.
+	- is not stored data but it saved query.
+	- is created with the help of "select command".
+	by using select query we can extract the required
+	data from base table and show to user through a 
+	view object.
+	- whenever we perform dml operations through a view
+	those operations are internally performed on base
+	table.
+
+syntax:
+=======
+create view <view name> as <select query>;
+
+Advantages:
+===========
+1. security:
+		> column level security
+		> row level security
+
+2. converting complex query into simple query.
+
+Ex:
+===
+create view v1 as
+select s.stid,s.sname,c.name,c.cfee,c.cid,r.regno,
+r.regdate from student s inner join course c 
+on s.cid=c.cid inner join register r 
+on c.cid=r.cid;---complex query
+
+Ex:
+select * from v1;----simple query
+
+3. to check data integrity rules.
+
+Types of views:
+===============
+		1. simple views
+		2. complex views
+
+1. simple views:
+================
+	- when we created a view to access the required data from a
+single base table is called as simple view.
+	- by default simpl views are supporting DML operations
+to perform over base table.
+
+Ex:
+create a view to access the data from dept table?
+SQL> CREATE VIEW V1 AS SELECT * FROM DEPT;
+
+TESTING:
+SQL> INSERT INTO V1 VALUES(50,'DBA','HYD');--allowed
+SQL> UPDATE V1 SET LOC='PUNE' WHERE DEPTNO=50;--allowed
+SQL> DELETE FROM V1 WHERE DEPTNO=50;---allowed
+SQL> SELECT * FROM V1;--allowed
+
+Ex:
+create a view to display empno,ename,sal from emp table?
+SQL> CREATE VIEW V2 AS SELECT EMPNO,ENAME,SAL FROM EMP;
+
+TESTING:
+INSERT INTO V2 VALUES(1122,'YUVIN',5600,10);          
+ERROR at line 1:
+ORA-00913: too many values
+
+INSERT INTO V2 VALUES(1122,'YUVIN');      
+ERROR at line 1:
+ORA-00947: not enough values
+
+SQL> INSERT INTO V2 VALUES(1122,'YUVIN',5600);--ALLOWED
+
+Ex:
+create a view to display employees details who are working 
+under deptno is 20?
+SQL> CREATE VIEW V3 AS SELECT * FROM EMP WHERE DEPTNO=20;
+
+TESTING:
+SQL> SELECT * FROM V3;
+
+VIEW OPTIONS:
+=============
+1) WITH CHECK OPTION
+2) WITH READ ONLY
+
+1) WITH CHECK OPTION:
+======================
+	- to check values with user defined condition in select 
+query at the time view creation.
+	- by using "with check option" statement we can restricted
+unwanted data on base table through a view object.
+
+Ex:
+create a view to display and also accept employee details 
+whose salary is 3000?
+
+SQL> CREATE VIEW V5 AS SELECT * FROM EMP WHERE SAL=3000
+  2  WITH CHECK OPTION;
+
+TESTING:
+INSERT INTO V5(EMPNO,ENAME,SAL)VALUES(1123,'WARNER',4500);
+ERROR at line 1:
+ORA-01402: view WITH CHECK OPTION where-clause violation
+
+INSERT INTO V5(EMPNO,ENAME,SAL)VALUES(1123,'WARNER',3000);--ALLOWED
+
+2) WITH READ ONLY:
+==================
+	- whenever a user want to restrict DML operations on a 
+base table through a view object then we use "with read only"
+statement like below,
+
+EX:
+SQL> CREATE VIEW V6
+  2  AS
+  3  SELECT * FROM DEPT WITH READ ONLY;
+
+TESTING:
+INSERT INTO V6 VALUES(50,'SAP','HYD');
+ERROR at line 1:
+ORA-42399: cannot perform a DML operation on a read-only view
+
+COMPLEX VIEW:
+=============
+	- when we called a view is complex view:
+			> based on multiple tables.
+			> by using group by
+			> by using having
+			> by using aggregative/grouping functions.
+			> by using distinct keyword.
+			> by using set operators
+			> by using joins
+			> by using subquery
+	- these complex view are not allowed dml operations
+	by default.
+
+syntax:
+=======
+create view <viewname> as <select query>;
+
+EX:
+SQL> CREATE VIEW V7
+  2  AS
+  3  SELECT * FROM EMP_HYD
+  4  UNION
+  5  SELECT * FROM EMP_CHENNAI;
+
+TESTING:
+SQL> INSERT INTO V7 VALUES(6,'YUVIN',56000);
+SQL> UPDATE V7 SET SAL=11000 WHERE EID=1;
+SQL> DELETE FROM V7 WHERE EID=5;
+ERROR at line 1:
+ORA-01732: data manipulation operation not legal 
+on this view.
+
+EX:
+SQL> CREATE VIEW V8
+  2  AS
+  3  SELECT DEPTNO,SUM(SAL) SUM_OF_SALARY FROM EMP 
+     GROUP BY DEPTNO;
+
+TESTING:
+SELECT * FROM V8;
+
+FORCE VIEW:
+===========
+	- when we created a view without base table is
+called as force view.
+
+syntax:
+=======
+create force view <view name> as <select query>;
+
+Ex:
+SQL> CREATE FORCE VIEW FV1
+  2  AS
+  3  SELECT * FROM TEST100;
+Warning: View created with compilation errors.
+
+TESTING:
+SQL> SELECT * FROM FV1           
+ERROR at line 1:
+ORA-04063: view "MYDB2PM.FV1" has errors
+
+	- to activate a force view then we should create 
+a base table with name as "test100".
+
+ex:
+SQL> CREATE TABLE TEST100(SNO INT,NAME VARCHAR2(10));
+
+Table created.
+
+SQL> INSERT INTO TEST100 VALUES(1,'SMITH');
+
+1 row created.
+
+SQL> SELECT * FROM TEST100;
+
+       SNO NAME
+---------- ----------
+         1 SMITH
+
+SQL> SELECT * FROM FV1;
+
+			SNO NAME
+---------- ----------
+         1 SMITH
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+	

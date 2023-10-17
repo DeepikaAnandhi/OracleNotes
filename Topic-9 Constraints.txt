@@ -1,0 +1,662 @@
+DATA INTEGRITY:
+===============
+	- to maintain accurate and consistency data in database tables.
+					1.Declarative integrity
+							> by using "constraints" (SQL)
+					2.Procedural integrity
+							> by using "triggers" (PL/SQL)
+
+Constraints:
+============
+	- to restricted / enforce unwanted data into a table.
+				> Unique
+				> Not null
+				> Check
+				> Primary key
+				> Foreign key / References
+				> Default
+	- can be defined at two levels on a table.
+
+1) column level:
+===============
+	- can be defined to each column wise.
+
+syntax:
+=======
+create table <tn>
+(
+<column name1> <dt>[size] <constraint type>,
+<column name2> <dt>[size] <constraint type>,
+<column name3> <dt>[size] <constraint type>,
+...........................................
+);
+
+2) table level:
+===============
+	- can be defined after all columns declared.(end of the table)
+	
+syntax:
+=======
+create table <tn>
+(
+<column name1> <dt>[size] ,
+<column name2> <dt>[size] ,
+<column name3> <dt>[size] ,
+..........................
+<constraint type>(<column1>,<column2>,...));
+
+note:
+=====
+	- table level constraints are also called as "composite constraint".
+
+UNIQUE:
+=======
+	- not allowed duplicate values but allowed NULLs.
+
+column level:
+=============
+SQL> CREATE TABLE TEST1(SNO INT UNIQUE,NAME VARCHAR2(10) UNIQUE);
+
+TESTING:
+SQL> INSERT INTO TEST1 VALUES(1,'A');---ALLOWED
+SQL> INSERT INTO TEST1 VALUES(1,'A');---NOT ALLOWED
+SQL> INSERT INTO TEST1 VALUES(NULL,NULL);---ALOWED
+
+TABLE LEVEL:
+============
+SQL> CREATE TABLE TEST2
+  2  (
+  3  SNO INT,
+  4  NAME VARCHAR2(10),
+  5  UNIQUE(SNO,NAME)
+  6  );
+
+TESTING
+SQL> INSERT INTO TEST2 VALUES(1,'IND');---ALLOWED
+SQL> INSERT INTO TEST2 VALUES(1,'AUS');---ALLOWED
+SQL> INSERT INTO TEST2 VALUES(1,'IND');---NOT ALLOWED
+
+NOT NULL:
+=========
+	- restricted NULLS but allowed duplicates.
+	- can defined at column level only.
+
+column level:
+=============
+SQL> CREATE TABLE TEST3(SNO INT NOT NULL,NAME VARCHAR2(10) NOT NULL);
+
+TESTING
+SQL> INSERT INTO TEST3 VALUES(1,'A');--- ALLOWED
+SQL> INSERT INTO TEST3 VALUES(1,'A');--- ALLOWED
+SQL> INSERT INTO TEST3 VALUES(NULL,NULL);---NOT ALLOWED
+
+PRIMARY KEY:
+============
+	- it is combination of unique and not null constraint.
+	- to restricted duplicates and nulls.
+	- a table is having only one primary key.
+
+column level:
+=============
+SQL> CREATE TABLE TEST4(EID INT PRIMARY KEY,
+  2  ENAME VARCHAR2(10));
+
+TESTING:
+SQL> INSERT INTO TEST4 VALUES(1,'SMITH');---ALLOWED
+SQL> INSERT INTO TEST4 VALUES(1,'ALLEN');---NO
+SQL> INSERT INTO TEST4 VALUES(NULL,'ALLEN');	---NO
+
+TABLE LEVEL:
+============
+SQL> CREATE TABLE TEST5(SNO INT,CNAME VARCHAR2(10),
+  2  PRIMARY KEY(SNO,CNAME));
+
+TESTING:
+SQL> INSERT INTO TEST5 VALUES(1,'C');---ALLOWED
+SQL> INSERT INTO TEST5 VALUES(1,'C');---NOT ALLOWED
+SQL> INSERT INTO TEST5 VALUES(1,'C++');---ALLOWED
+
+CHECK:
+======
+	- to check value with user defined condition.
+
+column level:
+=============
+SQL> CREATE TABLE TEST6(ENAME VARCHAR2(10),SAL NUMBER(10) 
+CHECK(SAL>5000));
+ 
+TESTING:
+SQL> INSERT INTO TEST6 VALUES('A',5000);---NO
+SQL> INSERT INTO TEST6 VALUES('A',5001);---ALLOWED
+
+TABLE LEVEL:
+============
+SQL> CREATE TABLE TEST7
+  2  (
+  3  ENAME VARCHAR2(10),
+  4  SAL NUMBER(10),
+  5  CHECK(ENAME=UPPER(ENAME) AND SAL>=8000)
+  6  );
+
+TESTING:
+SQL> INSERT INTO TEST7 VALUES('SAI',7500);---NO
+SQL> INSERT INTO TEST7 VALUES('sai',8500);---NO
+SQL> INSERT INTO TEST7 VALUES('SAI',8500);---ALLOWED
+
+FOREIGN KEY:
+============
+	- is used to create relationships between tables.
+
+Basic rules:
+============
+1. we have a common column in both tables and those datatypes
+must be match.
+		
+		Ex:
+						test1					test2
+						=====					======
+					sno int					sno int
+
+
+2. one table should have a PK and another table should have FK
+but PK and FK columns must be a common column only.
+
+		Ex:
+						test1					test2
+						=====					======
+					sno int(pk)				sno int(fk)
+
+3. a PK table is called as "parent" and a FK table is
+called as "child".
+
+		Ex:			(parent)				(child)
+						test1					test2
+						=====					======
+					sno int(pk)				sno int(fk)
+
+4. a FK column values must be a PK column values only.
+
+		Ex:		  (parent)			  (child)
+						test1					test2
+						=====					======
+					sno int(pk)				sno int(fk)
+					=============			===========
+						1						1
+						2						2
+												3-----error
+
+5. by default a FK column is accepting duplicate & null values.
+
+		Ex:		  (parent)			  (child)
+						test1					test2
+						=====					======
+					sno int(pk)				sno int(fk)
+					=============			===========
+						1						1
+						2						2
+												3-----error
+												1
+												1
+												2
+												4-----error
+												null---orphan
+
+Ex:
+SQL> CREATE TABLE DEPT1(DEPTNO INT PRIMARY KEY,
+  2  DNAME VARCHAR2(10));----PARENT TABLE
+
+SQL> INSERT INTO DEPT1 VALUES(1,'DB');
+SQL> INSERT INTO DEPT1 VALUES(2,'TESTING');
+
+SQL> CREATE TABLE EMP1(EID INT,
+  2  ENAME VARCHAR2(10),
+  3  DEPTNO INT REFERENCES
+  4  DEPT1(DEPTNO)
+  5  );----CHILD TABLE
+
+SQL> INSERT INTO EMP1 VALUES(101,'A',1);
+SQL> INSERT INTO EMP1 VALUES(102,'B',1);
+SQL> INSERT INTO EMP1 VALUES(103,'C',2);
+SQL> INSERT INTO EMP1 VALUES(105,'E',NULL);
+
+SQL> SELECT * FROM DEPT1;
+SQL> SELECT * FROM EMP1;
+
+NOTE:
+=====
+	- once we created a relationship between tables there are 
+two rules come into picture.
+
+rule-1(insertion):
+=================
+	- we cannot insert values into a foreign key column which
+was not found in primary key column of parent table.
+
+				NO PARENT = NO CHILD
+
+Ex:
+SQL> INSERT INTO EMP1 VALUES(106,'F',3);
+ERROR at line 1:
+ORA-02291: integrity constraint (MYDB2PM.SYS_C007661) 
+violated - parent key not found
+
+rule-2(deletion):
+=================
+	- we cannot delete a row from a parent that parent is 
+having child rows in child table without addressing to child.
+
+EX:
+SQL> DELETE FROM DEPT1 WHERE DEPTNO=1;
+ERROR at line 1:
+ORA-02292: integrity constraint (MYDB2PM.SYS_C007661) 
+violated - child record found
+
+HOW TO ADDRESS TO CHILD TABLE?
+==============================
+	- when we address to a child table then use the folowing
+rules are called as "cascade rules".
+
+1) on delete cascade:
+=====================
+	- once we delete a row from a parent then the corresponding
+child records are also deleted from child table automatically.
+
+Ex:
+SQL> CREATE TABLE DEPT2(DEPTNO INT PRIMARY KEY,
+     DNAME VARCHAR2(10));
+
+SQL> INSERT INTO DEPT2 VALUES(1,'DB');
+SQL> INSERT INTO DEPT2 VALUES(2,'TESTING');
+
+SQL> CREATE TABLE EMP2(EID INT,
+     ENAME VARCHAR2(10),
+     DEPTNO INT REFERENCES
+     DEPT2(DEPTNO) ON DELETE CASCADE
+     );
+
+SQL> INSERT INTO EMP2 VALUES(101,'A',1);
+SQL> INSERT INTO EMP2 VALUES(102,'B',1);
+SQL> INSERT INTO EMP2 VALUES(103,'C',2);
+
+
+SQL> SELECT * FROM DEPT2;
+SQL> SELECT * FROM EMP2;
+
+TESTING:
+SQL> DELETE FROM DEPT2 WHERE DEPTNO=1;---ALLOWED
+
+2) on delete set null:
+=======================
+	- once we delete a row from a parent then the corresponding
+child records reference key column values are convert
+into nulls in child table automatically.
+
+Ex:
+SQL> CREATE TABLE DEPT3(DEPTNO INT PRIMARY KEY,
+     DNAME VARCHAR2(10));
+
+SQL> INSERT INTO DEPT3 VALUES(1,'DB');
+SQL> INSERT INTO DEPT3 VALUES(2,'TESTING');
+
+SQL> CREATE TABLE EMP3(EID INT,
+     ENAME VARCHAR2(10),
+     DEPTNO INT REFERENCES
+     DEPT3(DEPTNO) ON DELETE SET NULL
+     );
+
+SQL> INSERT INTO EMP3 VALUES(101,'A',1);
+SQL> INSERT INTO EMP3 VALUES(102,'B',1);
+SQL> INSERT INTO EMP3 VALUES(103,'C',2);
+
+TESTING:
+DELETE FROM DEPT3 WHERE DEPTNO=1;---ALLOWED
+
+DATADICTIONARIES (OR) READ ONLY TABLES:
+========================================
+	- when we install oracle s/w internally system created some
+pre-defined table are called as "datadictionaries".
+	- these datadictionaries are stored the information which 
+related to db objects are tables,synonyms,views,sequences,
+index,constraints,.......etc.
+	- if we want to view all datadictionaries in oracle DB
+then we following,
+
+syntax:
+=======
+select * from dict;
+
+NOTE:
+=====
+	- if we want to view constraint name along with column name
+of a particular table in oracle then we use a datadictionary
+is called as "user_cons_columns".
+
+EX:
+SQL> DESC USER_CONS_COLUMNS;
+SQL> SELECT COLUMN_NAME,CONSTRAINT_NAME FROM USER_CONS_COLUMNS
+  2  WHERE TABLE_NAME='TEST1';
+
+COLUMN_NAME									CONSTRAINT_NAME
+------------------------				--------------------------------------------------------------------------------------------------------
+SNO											SYS_C007651
+NAME											SYS_C007652
+
+USER DEFINED CONSTRAINT KEY NAMES:
+===================================
+SYNTAX:
+=======
+<COLUMN NAME> <DT>[SIZE] CONSTRAINT 
+<USER DEFINED CONSTRAINT KEY NAME> <CONSTRAINT TYPE>
+
+EX:
+SQL> CREATE TABLE TEST8
+  2  (
+  3  SNO INT CONSTRAINT SNO_PK PRIMARY KEY,
+  4  NAME VARCHAR2(10) CONSTRAINT NAME_UQ UNIQUE
+  5  );
+
+SQL> SELECT COLUMN_NAME,CONSTRAINT_NAME FROM USER_CONS_COLUMNS
+  2  WHERE TABLE_NAME='TEST8';
+
+COLUMN_NAME									CONSTRAINT_NAME
+-------------------------			-------------------------------------------------------------------------------------------------------
+SNO											SNO_PK
+NAME											NAME_UQ
+
+How to add constraint to an existing table:
+===========================================
+syntax:
+=======
+alter table <tn> add constraint <constraint key name>
+<constraint type>(column name);
+
+i) adding primary key:
+======================
+EX:
+SQL> CREATE TABLE PARENT(
+  2  EID INT,
+  3  ENAME VARCHAR2(10),
+  4  SAL  NUMBER(10)
+  5  );
+
+SQL> ALTER TABLE PARENT ADD CONSTRAINT EID_PK PRIMARY KEY(EID);
+
+ii) adding unique,check constraint:
+====================================
+SQL> ALTER TABLE PARENT ADD CONSTRAINT ENAME_UQ UNIQUE(ENAME);
+SQL> ALTER TABLE PARENT ADD CONSTRAINT SAL_CHK CHECK(SAL>6000);
+
+iii) adding "not null" constraint:
+==================================
+syntax:
+=======
+alter table <tn> modify <column name> constraint <constraint key name>
+not null;
+
+EX:
+SQL> ALTER TABLE PARENT MODIFY ENAME CONSTRAINT ENAME_NN
+  2  NOT NULL;
+
+iv) adding foreign key:
+========================
+syntax:
+=======
+alter table <tn> add constraint <constraint key name>
+foreign key(common column of child) references 
+<parent table name>(common column of parent) 
+on delete cascade / on delete set null;
+
+EX:
+SQL> CREATE TABLE CHILD(DNAME VARCHAR2(10),EID INT);
+Table created.
+
+SQL> ALTER TABLE CHILD ADD CONSTRAINT EID_FK
+  2  FOREIGN KEY(EID) REFERENCES PARENT(EID)
+  3  ON DELETE CASCADE;
+
+How to DROP A constraint FROM an existing table:
+===========================================
+syntax:
+=======
+alter table <tn> drop constraint <constraint key name>;
+
+i) drop a primary key:
+======================
+case1: without relationship
+===========================
+SQL> ALTER TABLE PARENT DROP CONSTRAINT EID_PK;
+
+case2: with relationship:
+==========================
+SQL> ALTER TABLE PARENT DROP CONSTRAINT EID_PK CASCADE;
+
+ii) drop unique,check,not null constraint:
+===========================================
+SQL> ALTER TABLE PARENT DROP CONSTRAINT ENAME_UQ;
+SQL> ALTER TABLE PARENT DROP CONSTRAINT SAL_CHK;
+SQL> ALTER TABLE PARENT DROP CONSTRAINT ENAME_NN;
+
+How to rename a constraint name:
+================================
+syntax:
+=======
+alter table <tn> rename <constraint> <old constraint key name>
+to <new constraint key name>;
+
+EX:
+SQL> CREATE TABLE TEST9(CID INT PRIMARY KEY);
+
+SQL> SELECT COLUMN_NAME,CONSTRAINT_NAME FROM USER_CONS_COLUMNS
+  2  WHERE TABLE_NAME='TEST9';
+
+COLUMN_NAME								CONSTRAINT_NAME
+----------------------				----------------------------------------------------------------------------------------------------------
+CID										SYS_C007676
+
+SQL> ALTER TABLE TEST9 RENAME CONSTRAINT SYS_C007676 TO PK_CID;
+
+COLUMN_NAME								CONSTRAINT_NAME
+----------------------				----------------------------------------------------------------------------------------------------------
+CID										CID_PK
+
+How to disable / enable constraint on a table:
+==============================================
+syntax:
+=======
+alter table <tn> disable / enable constraint <constraint key name>;
+
+note:
+=====
+	- by default all constraints are working mode(enable).if we
+want to disable a constraint then we use " disable" keyword.
+
+EX:
+SQL> CREATE TABLE TEST10(ENAME VARCHAR2(10),
+  2  SAL NUMBER(10) CHECK(SAL>10000));
+
+TESTING:
+SQL> INSERT INTO TEST10 VALUES('A',8500);---NOT ALLOWED
+SQL> INSERT INTO TEST10 VALUES('A',12000);---ALLOWED
+
+HOW TO DISABLE A CONSTRAINT:
+============================
+SQL> ALTER TABLE TEST10 DISABLE CONSTRAINT SYS_C007677;
+
+TESTING:
+TESTING:
+SQL> INSERT INTO TEST10 VALUES('SMITH',8500);---ALLOWED
+
+HOW TO ENABLE A CONSTRAINT:
+===========================
+	- if we want to enable a check constraint on a column then
+we use a pre-defined statement is "novalidate".
+	- novalidate statement is not comparing existing values in
+a column but comparing newly inserting values.
+
+Ex:
+SQL> ALTER TABLE TEST10 ENABLE NOVALIDATE CONSTRAINT SYS_C007677;
+
+
+DEFAULT CONSTRAINT:
+===================
+	- is used to assign a user defined defualt value to a column.
+
+Ex:
+SQL> CREATE TABLE TEST11(NAME VARCHAR(10),LOC VARCHAR2(10) 
+DEFAULT 'HYD');
+
+TESTING
+SQL> INSERT INTO TEST11 VALUES('A','PUNE');
+SQL> INSERT INTO TEST11(NAME) VALUES('B');
+SQL> SELECT * FROM TEST11;
+
+NAME       LOC
+---------- ----------
+A          PUNE
+B          HYD
+
+How to add a default value to an existing table column:
+=======================================================
+syntax:
+=======
+alter table <tn> modify <column name> default <value>;
+
+EX:
+SQL> CREATE TABLE TEST12(SNO INT,SAL NUMBER(10));
+SQL> ALTER TABLE TEST12 MODIFY SAL DEFAULT 5000;
+
+TESTING:
+SQL> INSERT INTO TEST12(SNO)VALUES(1);
+SQL> SELECT * FROM TEST12;
+
+       SNO        SAL
+---------- ----------
+         1       5000
+
+How to remove a default value from a column:
+============================================
+ex:
+SQL> ALTER TABLE TEST12 MODIFY SAL DEFAULT null;
+
+testing:
+SQL> INSERT INTO TEST12(SNO)VALUES(2);
+SQL> SELECT * FROM TEST12;
+
+       SNO        SAL
+---------- ----------
+         2
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

@@ -1,0 +1,337 @@
+CLAUSES:
+========
+	==> Clause is statement to add to sql query for
+providing some additional facilities like 
+"filtering rows,sorting values,grouping similar data,
+finding sub total and grand total" based on columns
+automatically.
+				> where
+				> order by
+				> group by
+				> having
+				> rollup
+				> cube
+
+where:
+======
+	- to filtering rows before grouping data in a table.
+
+SYNTAX:
+=======
+	where <filtering condition>;
+
+Ex:
+select * from emp where empno=7788;
+update emp set sal=45000 where deptno=20;
+delete from emp where j0b='clerk';
+
+Note:
+=====
+	it can apply on "select,update,delete" commands only.
+
+order by:
+=========
+	- sorting values of a specific column.
+	- by default is "ascending order" if we want change 
+	in "descending order" then we use "desc" keyword.
+	- it can apply on "select" command only.
+
+syntax:
+=======
+select * / <list of columns> from <tn>
+order by <column name1> <asc/desc>,
+<column name2> <asc/desc>,.........;
+
+Ex:
+SQL> SELECT * FROM EMP ORDER BY SAL;
+SQL> SELECT * FROM EMP ORDER BY SAL DESC;
+SQL> SELECT SAL FROM EMP ORDER BY SAL DESC;
+
+SQL> SELECT ENAME FROM EMP ORDER BY ENAME;
+SQL> SELECT HIREDATE FROM EMP ORDER BY HIREDATE;
+
+EX:
+waq to display employees who are working under 
+deptno is 20 and arrange those employees salaries 
+in descending order?
+SQL> SELECT * FROM EMP WHERE DEPTNO=20 ORDER BY SAL DESC;
+
+EX:
+waq to arrange employees deptno's in ascending order
+and those employees salaries arrange in descending
+order to each deptno wise?
+SQL> SELECT * FROM EMP ORDER BY DEPTNO,SAL DESC;
+
+NOTE:
+=====
+	- order by clause can apply not only on column names
+even though we can apply on position of column in 
+the select query.
+
+EX:
+SQL> SELECT * FROM EMP ORDER BY sal;
+				(or)
+SQL> SELECT * FROM EMP ORDER BY 6;
+
+
+SQL> SELECT EMPNO,ENAME,SALARY FROM EMP ORDER BY 3;
+SQL> SELECT ENAME,SALARY FROM EMP ORDER BY 2;
+SQL> SELECT SALARY FROM EMP ORDER BY 1;
+
+ORDER BY CLAUSE WITH "NULL" CLAUSES:
+=====================================
+	- by default of order by clause on NULL in 
+	ascending order:
+					first values
+					later nulls
+	- to change this order then we use a null clause 
+along with order by cluase
+
+nulls first:
+============
+	- to display 
+			first nulls
+			later values
+
+Ex:
+SQL> SELECT * FROM EMP ORDER BY COMM;
+SQL> SELECT * FROM EMP ORDER BY COMM NULLS FIRST;
+	
+nulls last:
+===========
+	- to display
+				first values
+				later nulls
+
+EX:
+SQL> SELECT * FROM EMP ORDER BY COMM DESC;
+SQL> SELECT * FROM EMP ORDER BY COMM DESC NULLS LAST;
+
+group by:
+=========
+	- it is used to grouping a similar data based on
+column.
+	- when we use group by clause we must use "grouping
+function (or) aggregative functions" to get the final
+result.
+
+			ex:				group by 
+							 		|
+		count(job)			  job
+							     |
+clerk		|	salesman | 	president	|	manager  |	analyst
+clerk			salesman							manager		analyst
+clerk			salesman							manager
+clerk			salesman
+	|				 |					  |				|				|
+ (4)				(4)				 (1)			  (3)			  (2)
+
+syntax:
+=======
+select <column name1>,<column name2>,...........,
+<grouping function name1>,......................
+from <tn> group by <col1>,<col2>,........;
+
+Ex:
+waq to find out no.of employees working in each job wise?
+SQL> SELECT JOB,COUNT(JOB) NO_OF_EMPLOYEE FROM EMP GROUP BY JOB;
+
+
+Ex:
+waq to find out no.of employees working in each job along with
+their deptno wise?
+SQL> SELECT JOB,DEPTNO,COUNT(JOB) NO_OF_EMPLOYEE FROM EMP GROUP BY JOB;
+
+Ex:
+waq to find out sum of salaries of each deptno wise?
+SQL> SELECT DEPTNO,SUM(SAL) SUM_OF_SALARY FROM EMP
+  2  GROUP BY DEPTNO ORDER BY DEPTNO;
+
+Ex:
+SQL> SELECT DEPTNO,COUNT(DEPTNO) NO_OF_EMPLOYEE,
+  2  SUM(SAL) SUM_OF_SALARY,AVG(SAL) AVG_SALARY,
+  3  MIN(SAL) MIN_SALARY,MAX(SAL) MAX_SALARY FROM EMP
+  4  GROUP BY  DEPTNO ORDER BY DEPTNO;
+
+HAVING:
+=======
+	- to filtering rows after grouping data in a table.
+	- this can clause can be use along with "group by".
+
+syntax:
+=======
+select <column name1>,<column name2>,...........,
+<grouping function name1>,......................
+from <tn> group by <col1>,<col2>,....having<filtering condition>;
+
+Ex:
+waq to display jobs in which job the no.of employees are
+more than 3?
+SQL> SELECT JOB,COUNT(JOB) FROM EMP
+  2  GROUP BY JOB HAVING COUNT(JOB)>3;
+
+Ex:
+waq to display deptno's in which deptno sum of salary is less
+than to 10000?
+SQL> SELECT DEPTNO,SUM(SAL) FROM EMP
+  2  GROUP BY DEPTNO HAVING SUM(SAL)<10000 ORDER BY DEPTNO;
+
+ALL CLAUSES IN A SINGLE SELECT STATEMENT:
+=========================================
+SYNTAX:
+======
+SELECT <COL1>,.....,<GROUPING FUNCTION NAME1>,.....
+FROM <TN>	[  WHERE <FILTERING CONDITION>
+					GROUP BY <COL1>,<COL2>,......
+					HAVING <FILTERING CONDITION>
+					ORDER BY <COL1><ASC/DESC>,.....
+				];
+
+
+EX:
+SQL> SELECT DEPTNO,COUNT(DEPTNO) FROM EMP
+  2  WHERE SAL>1000
+  3  GROUP BY DEPTNO
+  4  HAVING COUNT(DEPTNO)>3
+  5  ORDER BY DEPTNO DESC;
+
+    DEPTNO COUNT(DEPTNO)
+---------- -------------
+        30             5
+        20             4
+
+EXECUTION ORDER OF CLAUSES:
+===========================
+	> FROM 
+		> WHERE
+			> GROUP BY
+					> HAVING
+						 > ORDER BY
+
+ROLLUP & CUBE:
+==============
+	- these are two special clauses in oracle.
+	- to find out sub total and also grand total based on columns.
+			> rollup : based on single column.
+			> cube   : based on multiple columns.
+	- these clauses can be implemented along with "group by"
+	clause.
+
+syntax for rollup:
+==================
+SELECT <COL1>,.....,<GROUPING FUNCTION NAME1>,.....
+FROM <TN> GROUP BY ROLLUP(<COL1>,<COL2>,......);
+								.........  ............
+									|					|
+								OPERATIONAL			SUPPORTING COLUMNS
+								COLUMN
+
+EX:
+SQL> SELECT DEPTNO,COUNT(DEPTNO) FROM EMP
+  2  GROUP BY ROLLUP(DEPTNO);
+
+    DEPTNO COUNT(DEPTNO)
+---------- -------------
+        10             3
+        20             5
+        30             6
+                      14
+
+
+EX:
+SQL> SELECT DEPTNO,JOB,COUNT(DEPTNO) FROM EMP
+  2  GROUP BY ROLLUP(DEPTNO,JOB);
+
+SQL> SELECT JOB,DEPTNO,COUNT(JOB) FROM EMP
+  2  GROUP BY ROLLUP(JOB,DEPTNO);
+
+
+syntax for cube:
+==================
+SELECT <COL1>,.....,<GROUPING FUNCTION NAME1>,.....
+FROM <TN> GROUP BY cube(<COL1>,<COL2>,......);
+								....................  
+									     |					
+								     OPERATIONAL			
+								       COLUMNS
+
+
+EX:
+SQL> SELECT DEPTNO,COUNT(DEPTNO)
+  2  FROM EMP GROUP BY CUBE(DEPTNO) ORDER BY DEPTNO;
+
+EX:
+SQL> SELECT DEPTNO,JOB,COUNT(DEPTNO)
+     FROM EMP GROUP BY CUBE(DEPTNO,JOB) ORDER BY DEPTNO;
+
+GROUPING_ID():
+==============
+	- more compact way to identify sub total rows and 
+grand total row from the result.
+
+		id
+		===
+		1 - the first sub total row column (DEPTNO)
+		2 - the second sub total row column	(JOB)	
+		3 - the grand total row
+
+
+EX:
+SQL> SELECT DEPTNO,JOB,COUNT(DEPTNO),GROUPING_ID(DEPTNO,JOB)
+     FROM EMP GROUP BY CUBE(DEPTNO,JOB) ORDER BY DEPTNO;
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+	
+
+
+
+
+
+
+
+
+
+
+
+

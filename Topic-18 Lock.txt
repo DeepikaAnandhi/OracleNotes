@@ -1,0 +1,137 @@
+LOCKS:
+======
+	- to prevent our resource.
+
+				1) row level locking
+				2) table level locking
+
+1) row level locking:
+=====================
+		i) single row lock
+		ii) multiple rows lock
+
+i) single row lock:
+===================
+	- oracle db server is locking a single row in a table.
+
+
+EX:
+				USER1									USER2
+				======									======
+sql> conn system/tiger						sql> conn mydb2pm/mydb2pm
+
+sql> update mydb2pm.emp set 				sql> update emp set
+sal=1100 where empno=7369;					sal=2200 where empno=7369;
+[ row is locked by db server]				[ we cannot perform update ]
+
+sql> commit/rollback;						1 row updated.
+[ lock is releasing ]
+
+
+ii) multiple rows lock:
+=======================
+	- when we lock multiple rows in a table then  we use "for update"
+clause in select query.
+
+
+EX:
+				USER1									USER2
+				======									======
+sql> conn system/tiger						sql> conn mydb2pm/mydb2pm
+
+sql> select * from mydb2pm.emp			sql> update emp set sal=3300
+where deptno=10 for update;					 where deptno=10;
+[ rows are locked by db server]				[ we cannot perform update ]
+
+sql> commit/rollback;						3 rows updated.
+[ lock is releasing ]
+
+DEAD LOCK:
+==========
+	- both users are waiting for their resources.
+
+
+EX:
+				USER1									USER2
+				======									======
+sql> conn system/tiger						sql> conn mydb2pm/mydb2pm
+
+sql> update mydb2pm.emp set				sql> update emp set sal=4400	
+sal=3300 where empno=7900;				where empno=7788;
+[ row is locked by db server]				[row is locked by db server ]
+
+sql> update mydb2pm.emp set				sql> update emp set sal=6600
+sal=5500 where empno=7788;				where empno=7900;
+[ we cannot perform update]				[ we cannot perform update]
+
+ERROR at line 1:
+ORA-00060: deadlock detected while 		1 row updated
+waiting for resource
+
+sql> commit/rollback;						
+[ lock is releasing ]
+
+2) table level locking:
+=======================
+	- in this level we can lock the entire table.
+				1) share lock
+				2) exclusive lock
+
+
+1) share lock:
+==============
+	- both users can lock a table.
+
+syntax:
+=======
+	lock table <tn> in share mode;
+
+ex:
+
+			USER1															USER2
+			======														======
+SQL> CONN SYSTEM/TIGER										SQL> CONN MYDB2PM/MYDB2PM
+
+SQL> LOCK TABLE MYDB2PM.EMP IN SHARE MODE;			SQL> LOCK TABLE EMP IN SHARE MODE;
+TABLE(S) LOCKED												TABLE(S) LOCKED.
+[WE CANNOT PERFORM DML OPERATIIONS]						[ WE CANNOT PERFORM DML OPERATIONS]
+
+SQL> COMMIT/ROLLBACK;										SQL> COMMIT/ROLLBACK;
+[ FOR LOCK RELEASING ]											[ FOR LOCK RELEASING ]
+
+2) exclusive lock:
+==================
+	- in this level any one user can lock a table.
+
+syntax:
+=======
+	lock table <tn> in exclusive mode;
+
+
+ex:
+
+			USER1															USER2
+			======														======
+SQL> CONN SYSTEM/TIGER										SQL> CONN MYDB2PM/MYDB2PM
+
+SQL> LOCK TABLE MYDB2PM.EMP IN EXCLUSIVE MODE;	   SQL> LOCK TABLE EMP IN EXCLUSIVE MODE;
+TABLE(S) LOCKED													[ WE CANNOT LOCK A TABLE]				
+																	
+	
+SQL> COMMIT/ROLLBACK;										  TABLE(s) LOCKED.
+[ FOR LOCK RELEASING ]											
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

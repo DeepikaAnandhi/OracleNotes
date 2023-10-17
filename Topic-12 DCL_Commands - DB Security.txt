@@ -1,0 +1,264 @@
+DB SECURITY:
+============
+		1. Authentication
+		2. Authorization
+
+1. Authentication:
+==================
+	- to check / verify user credentials(username & password)
+before login / connect to db server.
+	- these credentials are created by DBA only.
+
+syntax:
+=======
+create user <username> identified by <password>;
+
+Ex:
+create user u1 identified by u1;
+
+2.Authorization:
+================
+	- to perform some operations over database.
+	- giving by DBA only.
+	- by using "DCL" commands.
+
+DCL:
+====
+		i) grant 
+		ii) revoke
+
+i) grant:
+=========
+	- granting permissions to user.
+
+syntax:
+=======
+grant <privilege name> to <username>;
+
+
+ii) revoke:
+===========
+	- to cancel permissions of user.
+syntax:
+=======
+revoke <privilege name> from <username>;
+
+Privileges:
+===========
+	- privilege is nothing but permission.
+	- these privileges are two types.
+				1) system privileges
+				2) object privileges
+
+1) system privileges:
+=====================
+	- these privileges are giving by DBA only.
+Ex: connect,create table,unlimited tablespace,
+create view,create synonym,create sequence,create index,
+create materialized view,..................etc.
+
+syntax:
+=======
+grant <system privilege name> to <username>;
+
+Ex:
+sql> conn system/tiger
+sql> create user u1 identified by u1;
+sql> grant connect,create table,unlimited tablespace
+     to u1;
+
+sql> conn u1/u1
+sql> create table test1(sno int,name varchar2(10));
+sql> insert into test1 values(1,'smith');
+sql> update test1 set sno=1021 where sno=1;
+sql> delete from test1 where sno=1021;
+
+HOW TO CANCEL A PERMISSION OF USER:
+===================================
+sql> conn system/tiger
+sql> revoke connect from u1;
+
+SQL> CONN
+Enter user-name: U1/U1
+ERROR.
+
+2) object privileges:
+=====================
+	- these permissions are giving by DBA (or) USER
+to perform some operations over a table/db object.
+
+Ex: select,insert,update,delete / "all" keyword.
+
+syntax:
+=======
+grant <object privilege name> on 
+<table name / db object name> 
+to <username>;
+
+case-1: DBA to USER:
+====================
+EX:
+sql> conn system/tiger
+sql> create user u2 identified by u2;
+sql> grant connect to u2;
+
+sql> conn u2/u2
+sql> select * from dept;
+error.
+sql> select * from system.dept;
+error.
+
+SQL> INSERT INTO SYSTEM.DEPT VALUES(50,'DBA','HYD');
+error.
+
+SQL> UPDATE SYSTEM.DEPT SET LOC='PUNE' WHERE DEPTNO=50;
+error.
+
+SQL> DELETE FROM SYSTEM.DEPT WHERE DEPTNO=10;
+error
+
+Granting object privileges to user u2:
+======================================
+sql> conn system /tiger
+sql> grant select,insert,update,delete on dept to u2;
+						(or)
+sql> grant all on dept to u2;
+
+sql> select * from system.dept;---allowed
+SQL> INSERT INTO SYSTEM.DEPT VALUES(50,'DBA','HYD')--allowed
+SQL> UPDATE SYSTEM.DEPT SET LOC='PUNE' WHERE DEPTNO=50--allowed
+SQL> DELETE FROM SYSTEM.DEPT WHERE DEPTNO=10;---allowed
+
+Cancel object privileges of user u2:
+=====================================
+sql> conn system /tiger
+sql> revoke select,insert,update,delete on dept from u2;
+						(or)
+sql> revoke all on dept from u2;
+
+sql> select * from system.dept;
+error.
+
+case-2: User to User:
+=====================
+	- if a user want to give permission to another user then 
+the first user should get permission from DBA with 
+"with grant option" statement then only a user can give 
+permission to another user otherwise not possible.
+
+EX:
+sql> conn system/tiger
+sql> create user u22 identified by u22;
+sql> create user u33 identified by u33;
+
+sql> grant connect to u22;
+sql> grant connect to u33;
+
+sql> grant select on dept to u22 with grant option;
+sql> conn u22/u22
+sql> select * from system.dept;----allowed
+
+sql> grant select on system.dept to u33;
+Grant succeeded.
+
+SQL> CONN
+Enter user-name: U33/U33
+Connected.
+SQL> SELECT * FROM SYSTEM.DEPT;---allowed
+
+ROLE:
+=====
+	- a role is nothing but to assign same privileges to 
+group of users who are working on same project.
+	- these roles are created by DBA only.
+
+ex:
+						X-PROJECT
+                      |
+					MOD1	MOD2			MOD3
+					 |		 |		 		|
+					 3E	5E				3E
+				(A,B,C) (P,Q,R,S,T)	(X,Y,Z)
+					|
+					R1
+					|
+			CONNECT privilege
+
+	- to create a role we need to follow the following 3 steps
+those are,
+
+step1: create a role:
+=====================
+syntax:
+=======
+create role <role name>;
+
+step2: assigning privileges to a role:
+======================================
+syntax:
+=======
+grant <privilege name> to <role name>;
+
+step3: assigning role to users:
+===============================
+syntax:
+=======
+grant <role name> to <users>;
+
+EX:
+SQL> CREATE ROLE R1;
+Role created.
+
+SQL> GRANT CONNECT TO R1;
+Grant succeeded.
+
+SQL> GRANT R1 TO A,B,C;
+Grant succeeded.
+
+SQL> CONN
+Enter user-name: A/A
+Connected.
+
+SQL> CONN
+Enter user-name: B/B
+Connected.
+
+
+SQL> CONN
+Enter user-name: C/C
+Connected.
+
+
+
+SQL:
+====
+	> DDL
+	> DML					BY DEVELOPER
+	> DRL / DQL
+	> TCL
+	===========================
+	> DCL					BY DBA ONLY
+
+
+
+
+
+
+
+ 
+
+
+
+
+
+
+
+
+
+
+
+
+
+	
+
+
